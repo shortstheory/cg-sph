@@ -217,7 +217,7 @@ void display() {
         drawEdge(WALL_EDGE[i], WALL_SCALE[i]);
     }
 
-    if (debug) {
+    if (true) {
         // spheres for debug mode
         list<Particle> particle_list = sph.getList();
         for (Particle &particle : particle_list) {
@@ -249,27 +249,27 @@ void display() {
 // update for each frame
 void update(int value) {
     // move speed
-    cout << "SADUPDATE"<<endl;
-    // if (pos_now[0] != pos_pre[0] || pos_now[1] != pos_pre[1] || pos_now[2] != pos_pre[2]) {
-    //     cout <<"INTUDAS"<<endl;
-    //     vec3 delta = pos_now - pos_pre;
-    //     vec3 base_new = vec3(frame_base) + delta;
-    //     for (int i = 0; i < 2; ++i) {
-    //         if (abs(base_new[i]) > FRAME_LENGTH[i] * 2) {
-    //             base_new[i] = base_new[i] / abs(base_new[i]) * (FRAME_LENGTH[i] - 0.0001);
-    //         }
-    //     }
-    //     delta = base_new - frame_base;
-    //     for (int i = 0; i < 3; ++i) frame_base[i] = base_new[i];
-    //     pos_pre = pos_now;
-    //     sph.setBase(delta);
-    //     printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
-    // }
+    // cout << "SADUPDATE"<<endl;
+    if (pos_now[0] != pos_pre[0] || pos_now[1] != pos_pre[1] || pos_now[2] != pos_pre[2]) {
+        cout <<"INTUDAS"<<endl;
+        vec3 delta = pos_now - pos_pre;
+        vec3 base_new = vec3(frame_base) + delta;
+        for (int i = 0; i < 2; ++i) {
+            if (abs(base_new[i]) > FRAME_LENGTH[i] * 2) {
+                base_new[i] = base_new[i] / abs(base_new[i]) * (FRAME_LENGTH[i] - 0.0001);
+            }
+        }
+        delta = base_new - frame_base;
+        for (int i = 0; i < 3; ++i) frame_base[i] = base_new[i];
+        pos_pre = pos_now;
+        sph.setBase(delta);
+        printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
+    }
 
     // cout movement
     sph.move();
-    // glutTimerFunc(DELTA_TIME, update, 0);
-    // glutPostRedisplay();
+    glutTimerFunc(DELTA_TIME, update, 0);
+    glutPostRedisplay();
 }
 
 vec3 coordinateTrans(int x, int y) {
@@ -339,113 +339,113 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
 }
 
 int main(int argc, char **argv) {
-    // glutInit(&argc, argv);
-    // glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    // glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    // glutInitWindowPosition(100, 100);
-    // glutCreateWindow("SPH - ^.^");
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("SPH - ^.^");
 
-    // init();
-    // //noglut
+    init();
+    // // //noglut
 
-    if(!glfwInit()) {
-        fprintf( stderr, "Failed to initialize GLFW\n" );
-        getchar();
-        return false;
-    }
-    if (!initOpenGL()) {
-        return -1;
-    }
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Cubes!", NULL, NULL);
-    if(window == NULL){
-        glfwTerminate();
-        return -1;
-    }
-    setCallBacks(window);
-    glewExperimental = true;
-    std::cout << glewInit();
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
-        getchar();
-        glfwTerminate();
-        return false;
-    }
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // if(!glfwInit()) {
+    //     fprintf( stderr, "Failed to initialize GLFW\n" );
+    //     getchar();
+    //     return false;
+    // }
+    // if (!initOpenGL()) {
+    //     return -1;
+    // }
+    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Cubes!", NULL, NULL);
+    // if(window == NULL){
+    //     glfwTerminate();
+    //     return -1;
+    // }
+    // setCallBacks(window);
+    // glewExperimental = true;
+    // std::cout << glewInit();
+    // if (glewInit() != GLEW_OK) {
+    //     fprintf(stderr, "Failed to initialize GLEW\n");
+    //     getchar();
+    //     glfwTerminate();
+    //     return false;
+    // }
+    // glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
 
-    GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+    // GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
 
-    glm::mat4 proj;
-    glm::mat4 view;
+    // glm::mat4 proj;
+    // glm::mat4 view;
 
-    const int particleSize = 10;
-    sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
-    for (int i = 0; i < particleSize; i+=1 )
-        for (int j = 0; j < particleSize; j+=1)
-            for (int k = 0; k < particleSize; k+=1)
-                sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
+    // const int particleSize = 10;
+    // sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
+    // for (int i = 0; i < particleSize; i+=1 )
+    //     for (int j = 0; j < particleSize; j+=1)
+    //         for (int k = 0; k < particleSize; k+=1)
+    //             sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
 
-    vector<ObjectData> spheres;
-    GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
+    // vector<ObjectData> spheres;
+    // GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
 
-    for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
-        setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
-    }
+    // for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
+    //     setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
+    // }
 
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
+    // float deltaTime = 0.0f;
+    // float lastFrame = 0.0f;
 
-    milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-    int startTime = ms.count();
+    // milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+    // int startTime = ms.count();
 
-    while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
-        float currentFrame = glfwGetTime();
+    // while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
+    //     float currentFrame = glfwGetTime();
 
-        int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
-        int64_t frameDeltaTime = currentFrameTime - startTime;
-        deltaTime = currentFrame - lastFrame;
-        if (deltaTime > DELTA_TIME/10.0f) {
-            cout << deltaTime << endl;
-            lastFrame = currentFrame;
-            update(0);
-        }
-        // Used for capturing the WASD keys and mouse
-        camera.processInput(window, deltaTime);
-        // Defines what can be seen by the camera along with the clip boundaries of the scene
-        proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
-        view = camera.getCameraView();
+    //     int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
+    //     int64_t frameDeltaTime = currentFrameTime - startTime;
+    //     deltaTime = currentFrame - lastFrame;
+    //     if (deltaTime > DELTA_TIME/10.0f) {
+    //         cout << deltaTime << endl;
+    //         lastFrame = currentFrame;
+    //         update(0);
+    //     }
+    //     // Used for capturing the WASD keys and mouse
+    //     camera.processInput(window, deltaTime);
+    //     // Defines what can be seen by the camera along with the clip boundaries of the scene
+    //     proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
+    //     view = camera.getCameraView();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(programID);
-        int i = 0;
-        list<Particle> particle_list = sph.getList();
-        // for (auto it = spheres.begin(); it != spheres.end(); it++) {
-        //     drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false, particle_list..getPosition());
-        // }
-        for (Particle &particle : particle_list) {
-            if (i < spheres.size()) {
-                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
-                // cout << particle.getPosition().x << ' ' << particle.getPosition().y << ' '<< particle.getPosition().z << ' ';
-            }
-            i++;
-        }
-        // cout << endl << "BREAK" << endl;
+    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //     glUseProgram(programID);
+    //     int i = 0;
+    //     list<Particle> particle_list = sph.getList();
+    //     // for (auto it = spheres.begin(); it != spheres.end(); it++) {
+    //     //     drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false, particle_list..getPosition());
+    //     // }
+    //     for (Particle &particle : particle_list) {
+    //         if (i < spheres.size()) {
+    //             drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
+    //             // cout << particle.getPosition().x << ' ' << particle.getPosition().y << ' '<< particle.getPosition().z << ' ';
+    //         }
+    //         i++;
+    //     }
+    //     // cout << endl << "BREAK" << endl;
         
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-	glDeleteProgram(programID);
+    //     glfwSwapBuffers(window);
+    //     glfwPollEvents();
+    // }
+	// glDeleteProgram(programID);
 
-	glfwTerminate();
+	// glfwTerminate();
 
 
     //glut
-    // glutDisplayFunc(display);
+    glutDisplayFunc(display);
 
-    // glutTimerFunc(DELTA_TIME, update, 0);
-    // glutReshapeFunc(reshape);
-    // glutMainLoop();
+    glutTimerFunc(DELTA_TIME, update, 0);
+    glutReshapeFunc(reshape);
+    glutMainLoop();
 
     return 0;
 }

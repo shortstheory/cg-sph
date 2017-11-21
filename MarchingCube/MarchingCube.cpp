@@ -59,7 +59,7 @@ MarchingCube::~MarchingCube() {
     }
 }
 
-void MarchingCube::count(vector<Vector3D> &vertexs, vector<int> &tri_index) {
+void MarchingCube::count(vector<vec3> &vertexs, vector<int> &tri_index) {
     vertexs.clear();
     tri_index.clear();
 
@@ -68,7 +68,7 @@ void MarchingCube::count(vector<Vector3D> &vertexs, vector<int> &tri_index) {
     for (int i = 0; i <= total_edge[0]; ++i) {
         for (int j = 0; j <= total_edge[1]; ++j) {
             for (int k = 0; k <= total_edge[2]; ++k, ++p) {
-                Vector3D vetex(base[0] + i * l, base[1] + j * l, base[2] + k * l);
+                vec3 vetex(base[0] + i * l, base[1] + j * l, base[2] + k * l);
                 inside[p] = check(vetex);
             }
         }
@@ -79,10 +79,10 @@ void MarchingCube::count(vector<Vector3D> &vertexs, vector<int> &tri_index) {
     for (int i = 0; i <= total_edge[0]; ++i) {
         for (int j = 0; j <= total_edge[1]; ++j) {
             for (int k = 0; k <= total_edge[2]; ++k, p += 3) {
-                Vector3D v0(base[0] + i * l    , base[1] + j * l    , base[2] + k * l    );
-                Vector3D v1(base[0] + i * l + l, base[1] + j * l    , base[2] + k * l    );
-                Vector3D v2(base[0] + i * l    , base[1] + j * l + l, base[2] + k * l    );
-                Vector3D v3(base[0] + i * l    , base[1] + j * l    , base[2] + k * l + l);
+                vec3 v0(base[0] + i * l    , base[1] + j * l    , base[2] + k * l    );
+                vec3 v1(base[0] + i * l + l, base[1] + j * l    , base[2] + k * l    );
+                vec3 v2(base[0] + i * l    , base[1] + j * l + l, base[2] + k * l    );
+                vec3 v3(base[0] + i * l    , base[1] + j * l    , base[2] + k * l + l);
 
                 if (tmp = diff(inside[p / 3], inside[p / 3 + dx])) {
                     intersections[p    ] = countInter(v0, v1, tmp);
@@ -131,11 +131,11 @@ void MarchingCube::count(vector<Vector3D> &vertexs, vector<int> &tri_index) {
 }
 
 // return the closeset particle if there is a particle contain this vertex, otherwise NULL
-Particle* MarchingCube::check(Vector3D v) const {
+Particle* MarchingCube::check(vec3 v) const {
     double min_dis2 = l * l + 0.1;
     Particle* result = NULL;
     for (auto particle: *particles) {
-        double dis2 = (particle.getPosition() - v).norm2();
+        double dis2 = getMagnitude2((particle.getPosition() - v));
         if (dis2 < min_dis2) {
             min_dis2 = dis2;
             result = &particle;
@@ -152,8 +152,8 @@ Particle* MarchingCube::diff(Particle* a, Particle* b) const {
     return NULL;
 }
 
-Vector3D* MarchingCube::countInter(const Vector3D &v, const Vector3D &u, Particle* tmp) const {
-    return new Vector3D((v + u) * 0.5f);
+vec3* MarchingCube::countInter(const vec3 &v, const vec3 &u, Particle* tmp) const {
+    return new vec3((v + u) * 0.5f);
 
     // TODO: count intersection between v-u and particle tmp
 }

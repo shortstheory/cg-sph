@@ -1,4 +1,5 @@
 #include "Particle.h"
+#include <stdio.h>
 
 const double KERNAL_POLY_CONSTANT = 4.921875;
 const double KERNAL_POLY_GRAD_CONSTANT = -9.4000888;
@@ -49,7 +50,7 @@ void Particle::countColorfield(const vector<Particle> &neighbour, const vector<d
         color_grad += ratio * KernalPolyGrad(neighbour[i], r[i]);
         color_lap += ratio * KernalPolyLap(neighbour[i], r[i]);
     }
-    if (normalize(color_grad) > 1e-6) tenssion = - color_lap * color_grad.unit() * 1e-4;
+    if (getMagnitude(color_grad) > 1e-6) tenssion = - (float)(color_lap * 1e-4) * getUnitVector(color_grad);
     else tenssion = vec3(0.0f, 0.0f, 0.0f);
 }
 
@@ -60,14 +61,14 @@ void Particle::countVelocity(const vec3 &base_move) {
 }
 
 void Particle::move() {
-    //printf("force: %lf, %lf, %lf\n", force[0], force[1], force[2]);
-    //printf("viscosity: %lf, %lf, %lf\n", viscosity[0], viscosity[1], viscosity[2]);
-    //printf("tenssion: %lf, %lf, %lf\n", tenssion[0], tenssion[1], tenssion[2]);
-    //printf("velocity0: %lf, %lf, %lf\n", velocity[0], velocity[1], velocity[2]);		
-    position += velocity * DELTA_TIME / 1000;
-    //printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
-    //printf("density: %lf\n", density);
-    //printf("pressure: %lf\n", pressure);
+    printf("force: %lf, %lf, %lf\n", force[0], force[1], force[2]);
+    printf("viscosity: %lf, %lf, %lf\n", viscosity[0], viscosity[1], viscosity[2]);
+    printf("tenssion: %lf, %lf, %lf\n", tenssion[0], tenssion[1], tenssion[2]);
+    printf("velocity0: %lf, %lf, %lf\n", velocity[0], velocity[1], velocity[2]);		
+    position += velocity * (float)(DELTA_TIME / 1000.0f);
+    printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
+    printf("density: %lf\n", density);
+    printf("pressure: %lf\n", pressure);
 }
 void Particle::check(const vec3 &bound) {
     for (int i = 0; i < 3; ++i) {

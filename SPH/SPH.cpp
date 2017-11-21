@@ -14,7 +14,7 @@ void SPH::move() {
         j = i + 1;
         for (auto it1 = ++it0; it1 != particle_list.end(); ++it1, ++j) {
             Particle p1 = *it1;
-            double r = (p0.getPosition() - p1.getPosition()).norm();
+            double r = getMagnitude((p0.getPosition() - p1.getPosition()));
 
             if (r < SMOOTHING_WIDTH) {
                 neighbour_list[i].push_back(p1);

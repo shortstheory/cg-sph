@@ -63,14 +63,14 @@ void Particle::countVelocity(const vec3 &base_move) {
 }
 
 void Particle::move() {
-    printf("force: %lf, %lf, %lf\n", force[0], force[1], force[2]);
-    printf("viscosity: %lf, %lf, %lf\n", viscosity[0], viscosity[1], viscosity[2]);
-    printf("tenssion: %lf, %lf, %lf\n", tenssion[0], tenssion[1], tenssion[2]);
-    printf("velocity0: %lf, %lf, %lf\n", velocity[0], velocity[1], velocity[2]);		
+    // printf("force: %lf, %lf, %lf\n", force[0], force[1], force[2]);
+    // printf("viscosity: %lf, %lf, %lf\n", viscosity[0], viscosity[1], viscosity[2]);
+    // printf("tenssion: %lf, %lf, %lf\n", tenssion[0], tenssion[1], tenssion[2]);
+    // printf("velocity0: %lf, %lf, %lf\n", velocity[0], velocity[1], velocity[2]);		
     position += velocity * (float)(DELTA_TIME / 1000.0f);
-    printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
-    printf("density: %lf\n", density);
-    printf("pressure: %lf\n", pressure);
+    // printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
+    // printf("density: %lf\n", density);
+    // printf("pressure: %lf\n", pressure);
 }
 void Particle::check(const vec3 &bound) {
     for (int i = 0; i < 3; ++i) {

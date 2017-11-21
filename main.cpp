@@ -19,13 +19,27 @@
 #include <vector>
 
 #include "includes/constant.h"
+#include "includes/Camera.h"
 // #include "includes/vector3D.h"
 #include "includes/shader.h"
 #include "SPH/SPH.h"
 #include "MarchingCube/MarchingCube.h"
 
+#define SQUARE_SIDE 20
+#define MIN_ALT 0.5f
+#define MAX_ALT 100.0f
+
 using namespace std;
 using namespace glm;
+
+const GLfloat x_min = -SQUARE_SIDE;
+const GLfloat x_max = SQUARE_SIDE;
+const GLfloat y_min = MIN_ALT;
+const GLfloat y_max = MAX_ALT;
+const GLfloat z_min = -SQUARE_SIDE;
+const GLfloat z_max = SQUARE_SIDE;
+
+static Camera camera(WINDOW_WIDTH, WINDOW_WIDTH, x_min, x_max, y_min, y_max, z_min, z_max);
 
 SPH sph;
 
@@ -33,6 +47,21 @@ bool debug = false;
 bool is_press = false;
 vec3 pos_pre, pos_now;
 vec3 frame_base;
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.scroll_callback(window, xoffset, yoffset);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    camera.mouse_callback(window, xpos, ypos);
+}
 
 // initiate, set color and lighting
 void init() {
@@ -207,6 +236,11 @@ bool initOpenGL()
 void setCallBacks(GLFWwindow* window)
 {
     glfwMakeContextCurrent(window);
+}
+
+void renderLoop()
+{
+
 }
 
 int main(int argc, char **argv) {

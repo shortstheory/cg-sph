@@ -30,6 +30,7 @@
 #define SQUARE_SIDE 20
 #define MIN_ALT 0.5f
 #define MAX_ALT 100.0f
+#define GLUT false
 
 using namespace std;
 using namespace glm;
@@ -204,7 +205,7 @@ void drawSphere(const vec3 _pos) {
     glTranslatef(_pos[0] + frame_base[0], _pos[1] + frame_base[1], _pos[2] + frame_base[2]);
     //glScalef(FRAME_SCALE[0], FRAME_SCALE[1], FRAME_SCALE[2]);	
     glRotated(0, 0, 0, 0);
-    glutSolidSphere(0.3f, 100, 100);
+    glutSolidSphere(0.03f, 100, 100);
 
     glPopMatrix();	
 }
@@ -268,8 +269,10 @@ void update(int value) {
 
     // cout movement
     sph.move();
-    glutTimerFunc(DELTA_TIME, update, 0);
-    glutPostRedisplay();
+    if (GLUT) {
+        glutTimerFunc(DELTA_TIME, update, 0);
+        glutPostRedisplay();
+    }
 }
 
 vec3 coordinateTrans(int x, int y) {
@@ -339,113 +342,124 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
 }
 
 int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("SPH - ^.^");
-
-    init();
+    const int particleSize = 10;
     // // //noglut
+    if (GLUT) {
+        glutInit(&argc, argv);
+        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+        glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        glutInitWindowPosition(100, 100);
+        glutCreateWindow("SPH - ^.^");
 
-    // if(!glfwInit()) {
-    //     fprintf( stderr, "Failed to initialize GLFW\n" );
-    //     getchar();
-    //     return false;
-    // }
-    // if (!initOpenGL()) {
-    //     return -1;
-    // }
-    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Cubes!", NULL, NULL);
-    // if(window == NULL){
-    //     glfwTerminate();
-    //     return -1;
-    // }
-    // setCallBacks(window);
-    // glewExperimental = true;
-    // std::cout << glewInit();
-    // if (glewInit() != GLEW_OK) {
-    //     fprintf(stderr, "Failed to initialize GLEW\n");
-    //     getchar();
-    //     glfwTerminate();
-    //     return false;
-    // }
-    // glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    // glEnable(GL_DEPTH_TEST);
-    // glDepthFunc(GL_LESS);
-
-    // GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
-
-    // glm::mat4 proj;
-    // glm::mat4 view;
-
-    // const int particleSize = 10;
+        init();
+        //does this depend on glut?
     // sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
-    // for (int i = 0; i < particleSize; i+=1 )
-    //     for (int j = 0; j < particleSize; j+=1)
-    //         for (int k = 0; k < particleSize; k+=1)
-    //             sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
+    for (int i = 0; i < particleSize; i+=1 )
+        for (int j = 0; j < particleSize; j+=1)
+            for (int k = 0; k < particleSize; k+=1)
+                sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
 
-    // vector<ObjectData> spheres;
-    // GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
+    } else {
 
-    // for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
-    //     setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
-    // }
+    sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
+    for (int i = 0; i < particleSize; i+=1 )
+        for (int j = 0; j < particleSize; j+=1)
+            for (int k = 0; k < particleSize; k+=1)
+                sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
 
-    // float deltaTime = 0.0f;
-    // float lastFrame = 0.0f;
+    if(!glfwInit()) {
+        fprintf( stderr, "Failed to initialize GLFW\n" );
+        getchar();
+        return false;
+    }
+    if (!initOpenGL()) {
+        return -1;
+    }
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Cubes!", NULL, NULL);
+    if(window == NULL){
+        glfwTerminate();
+        return -1;
+    }
+    setCallBacks(window);
+    glewExperimental = true;
+    std::cout << glewInit();
+    if (glewInit() != GLEW_OK) {
+        fprintf(stderr, "Failed to initialize GLEW\n");
+        getchar();
+        glfwTerminate();
+        return false;
+    }
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
-    // milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-    // int startTime = ms.count();
+    GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
 
-    // while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
-    //     float currentFrame = glfwGetTime();
+    glm::mat4 proj;
+    glm::mat4 view;
 
-    //     int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
-    //     int64_t frameDeltaTime = currentFrameTime - startTime;
-    //     deltaTime = currentFrame - lastFrame;
-    //     if (deltaTime > DELTA_TIME/10.0f) {
-    //         cout << deltaTime << endl;
-    //         lastFrame = currentFrame;
-    //         update(0);
-    //     }
-    //     // Used for capturing the WASD keys and mouse
-    //     camera.processInput(window, deltaTime);
-    //     // Defines what can be seen by the camera along with the clip boundaries of the scene
-    //     proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
-    //     view = camera.getCameraView();
 
-    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //     glUseProgram(programID);
-    //     int i = 0;
-    //     list<Particle> particle_list = sph.getList();
-    //     // for (auto it = spheres.begin(); it != spheres.end(); it++) {
-    //     //     drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false, particle_list..getPosition());
-    //     // }
-    //     for (Particle &particle : particle_list) {
-    //         if (i < spheres.size()) {
-    //             drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
-    //             // cout << particle.getPosition().x << ' ' << particle.getPosition().y << ' '<< particle.getPosition().z << ' ';
-    //         }
-    //         i++;
-    //     }
-    //     // cout << endl << "BREAK" << endl;
+
+    vector<ObjectData> spheres;
+    GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
+
+    for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
+        setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
+    }
+
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
+    milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+    int startTime = ms.count();
+
+    while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+
+        int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
+        int64_t frameDeltaTime = currentFrameTime - startTime;
+        deltaTime = currentFrame - lastFrame;
+        if (deltaTime > DELTA_TIME/10.0f) {
+            cout << deltaTime << endl;
+            lastFrame = currentFrame;
+            update(0);
+        }
+        // Used for capturing the WASD keys and mouse
+        camera.processInput(window, deltaTime);
+        // Defines what can be seen by the camera along with the clip boundaries of the scene
+        proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
+        view = camera.getCameraView();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glUseProgram(programID);
+        int i = 0;
+        list<Particle> particle_list = sph.getList();
+        // for (auto it = spheres.begin(); it != spheres.end(); it++) {
+        //     drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false, particle_list..getPosition());
+        // }
+        for (Particle &particle : particle_list) {
+            if (i < spheres.size()) {
+                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
+                // cout << particle.getPosition().x << ' ' << particle.getPosition().y << ' '<< particle.getPosition().z << ' ';
+            }
+            i++;
+        }
+        // cout << endl << "BREAK" << endl;
         
-    //     glfwSwapBuffers(window);
-    //     glfwPollEvents();
-    // }
-	// glDeleteProgram(programID);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+	glDeleteProgram(programID);
 
-	// glfwTerminate();
+	glfwTerminate();
+    }
 
-
-    //glut
+    if(GLUT) {
     glutDisplayFunc(display);
 
     glutTimerFunc(DELTA_TIME, update, 0);
     glutReshapeFunc(reshape);
     glutMainLoop();
-
+    }
     return 0;
 }

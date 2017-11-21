@@ -16,7 +16,7 @@ const double SMOOTHING_WIDTH = 0.04f;
 const double SMOOTHING_WIDTH2 = SMOOTHING_WIDTH * SMOOTHING_WIDTH;
 const double SMOOTHING_WIDTH3 = SMOOTHING_WIDTH * SMOOTHING_WIDTH2;
 const double mass = 0.02f;
-const int DELTA_TIME = 25;
+const int DELTA_TIME = 16;
 const double g = -9.8f;
 
 const double Pi = 3.1415926;

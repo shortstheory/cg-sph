@@ -29,7 +29,7 @@ Camera::Camera(int screenHeight, int screenWidth, GLfloat x_min, GLfloat x_max, 
     yaw = -90.0f;
     pitch =  0.0f;
     MAX_FOV = 90;
-    fov = MAX_FOV;
+    fov = MAX_FOV/2;
     cameraPos = glm::vec3(0, y_min+3, 5);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -105,7 +105,7 @@ void Camera::processInput(GLFWwindow *window, float deltaTime)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = 5.0 * deltaTime;
+    float cameraSpeed = 0.1 * deltaTime;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         cameraPos += cameraSpeed * cameraFront;

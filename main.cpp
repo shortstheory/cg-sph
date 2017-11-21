@@ -282,6 +282,8 @@ vec3 coordinateTrans(int x, int y) {
 
 bool initOpenGL()
 {
+    // sph = SPH(FRAME_LENGTH);
+
     // Set OpenGL version to 3.3
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -360,7 +362,7 @@ int main(int argc, char **argv) {
                 sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
 
     } else {
-
+    sph = SPH(FRAME_LENGTH);
     sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
     for (int i = 0; i < particleSize; i+=1 )
         for (int j = 0; j < particleSize; j+=1)
@@ -419,11 +421,11 @@ int main(int argc, char **argv) {
         int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
         int64_t frameDeltaTime = currentFrameTime - startTime;
         deltaTime = currentFrame - lastFrame;
-        if (deltaTime > DELTA_TIME/10.0f) {
-            cout << deltaTime << endl;
-            lastFrame = currentFrame;
+        // if (deltaTime > DELTA_TIME/10.0f) {
+        //     cout << deltaTime << endl;
+        //     lastFrame = currentFrame;
             update(0);
-        }
+        // }
         // Used for capturing the WASD keys and mouse
         camera.processInput(window, deltaTime);
         // Defines what can be seen by the camera along with the clip boundaries of the scene

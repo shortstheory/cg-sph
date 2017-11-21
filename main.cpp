@@ -1,3 +1,14 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <iostream>
+#include <utility>
+#include <cstring>
+
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
@@ -9,6 +20,7 @@
 
 #include "includes/constant.h"
 #include "includes/vector3D.h"
+#include "includes/shader.h"
 #include "SPH/SPH.h"
 #include "MarchingCube/MarchingCube.h"
 
@@ -50,6 +62,7 @@ void init() {
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 }
+
 
 void reshape(GLsizei width, GLsizei height) {
     glutReshapeWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -161,26 +174,6 @@ void update(int value) {
     glutPostRedisplay();
 }
 
-void keyboard(unsigned char key, int x, int y) {
-    switch (key) {
-        // generate a new particle(new drop of water)
-        case 'a':
-            sph.add(Particle(Vector3D(0, 0, 0), Vector3D(0, 0, 0)));
-            break;
-            // switch between two modes
-        case 'c':
-            debug = !debug;
-            break;
-        case 's':
-            break;
-        case 27:
-            exit(0);
-            break;
-        default:
-            break;
-    }
-}
-
 Vector3D coordinateTrans(int x, int y) {
     x -= WINDOW_WIDTH / 2; y -= WINDOW_HEIGHT / 2;
     return Vector3D((x + 0.0) / WINDOW_WIDTH * (FRAME_LENGTH[0] * 2.2f), (y + 0.0) / WINDOW_HEIGHT * (FRAME_LENGTH[1] * 2.2f) * -1, 0);
@@ -199,10 +192,15 @@ void mousepress(int button, int state, int x, int y) {
     }
 }
 
-void mousemove(int x, int y) {
-    if (is_press) {
-        pos_now = coordinateTrans(x, y);
-    }
+
+bool initOpenGL()
+{
+    // Set OpenGL version to 3.3
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    return true;
 }
 
 int main(int argc, char **argv) {
@@ -213,6 +211,34 @@ int main(int argc, char **argv) {
     glutCreateWindow("SPH - ^.^");
 
     init();
+
+    // if(!glfwInit()) {
+    //     fprintf( stderr, "Failed to initialize GLFW\n" );
+    //     getchar();
+    //     return false;
+    // }
+    // if (!initOpenGL()) {
+    //     return -1;
+    // }
+    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Cubes!", NULL, NULL);
+    // if(window == NULL){
+    //     glfwTerminate();
+    //     return -1;
+    // }
+    // // setCallBacks(window);
+    // glewExperimental = true;
+    // if (glewInit() != GLEW_OK) {
+    //     fprintf(stderr, "Failed to initialize GLEW\n");
+    //     getchar();
+    //     glfwTerminate();
+    //     return false;
+    // }
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
+
+    // GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+
+
     const int particleSize = 10;
     // sph.add(Particle(Vector3D(0, 0, 0), Vector3D(0, 0, 0)));
     for (int i = 0; i < particleSize; i+=1 )
@@ -222,9 +248,7 @@ int main(int argc, char **argv) {
     //sph.add(Particle(Vector3D(0 + i, 0 + j * 0.8, 0 + k), Vector3D(0, 0, 0)));
 
     glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutMouseFunc(mousepress);
-    glutMotionFunc(mousemove);
+
     glutTimerFunc(DELTA_TIME, update, 0);
     glutReshapeFunc(reshape);
     glutMainLoop();

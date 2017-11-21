@@ -6,8 +6,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
 project(opengl_assignment)
 
-add_executable(cg_sph main.cpp "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp")
-
+add_executable(cg_sph main.cpp "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp" "includes/shader.cpp")
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/includes/ColorFragmentShader.fragmentshader
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/includes/TransformVertexShader.vertexshader
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)

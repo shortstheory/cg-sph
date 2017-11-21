@@ -20,6 +20,7 @@
 
 #include "includes/constant.h"
 #include "includes/Camera.h"
+#include "includes/sphere.h"
 // #include "includes/vector3D.h"
 #include "includes/shader.h"
 #include "SPH/SPH.h"
@@ -43,10 +44,14 @@ static Camera camera(WINDOW_WIDTH, WINDOW_WIDTH, x_min, x_max, y_min, y_max, z_m
 
 SPH sph;
 
-bool debug = false;
+bool debug = true;
 bool is_press = false;
 vec3 pos_pre, pos_now;
 vec3 frame_base;
+
+struct ObjectMetaData {
+    GLuint ModelArrayID, ModelVBO, ModelColorVBO, ModelNormalVBO, EBO, indexSize;
+};
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -137,7 +142,7 @@ void drawSphere(const vec3 _pos) {
     glTranslatef(_pos[0] + frame_base[0], _pos[1] + frame_base[1], _pos[2] + frame_base[2]);
     //glScalef(FRAME_SCALE[0], FRAME_SCALE[1], FRAME_SCALE[2]);	
     glRotated(0, 0, 0, 0);
-    glutSolidSphere(0.03f, 100, 100);
+    glutSolidSphere(0.3f, 100, 100);
 
     glPopMatrix();	
 }
@@ -208,20 +213,6 @@ vec3 coordinateTrans(int x, int y) {
     x -= WINDOW_WIDTH / 2; y -= WINDOW_HEIGHT / 2;
     return vec3((x + 0.0) / WINDOW_WIDTH * (FRAME_LENGTH[0] * 2.2f), (y + 0.0) / WINDOW_HEIGHT * (FRAME_LENGTH[1] * 2.2f) * -1, 0);
 }
-
-// mouse event detect for container movement
-void mousepress(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_DOWN) {
-            is_press = true;
-            pos_pre = coordinateTrans(x, y);	
-            pos_now = pos_pre;
-        } else if (state == GLUT_UP) {
-            is_press = false;
-        }
-    }
-}
-
 
 bool initOpenGL()
 {

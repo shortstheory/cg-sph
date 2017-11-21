@@ -25,6 +25,7 @@
 #include "MarchingCube/MarchingCube.h"
 
 using namespace std;
+using namespace glm;
 
 SPH sph;
 

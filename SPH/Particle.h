@@ -3,10 +3,14 @@
 
 #include <cmath>
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include "../includes/vector3D.h"
 #include "../includes/constant.h"
 
 using namespace std;
+using namespace glm;
 
 class Particle {
     public:

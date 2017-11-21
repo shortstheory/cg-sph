@@ -2,12 +2,16 @@
 #define MARCHINGCUBE_H
 
 #include <list>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include "../includes/constant.h"
 #include "lookup_list.h"
 #include "../SPH/Particle.h"
 #include "../includes/vector3D.h"
 
 using namespace std;
+using namespace glm;
 
 class MarchingCube {
     public:

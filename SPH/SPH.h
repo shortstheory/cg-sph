@@ -2,11 +2,15 @@
 #define SPH_H
 
 #include <list>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include "../includes/constant.h"
 #include "../includes/vector3D.h"
 #include "Particle.h"
 
 using namespace std;
+using namespace glm;
 
 class SPH {
     public:

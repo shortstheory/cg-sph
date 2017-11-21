@@ -27,11 +27,14 @@
 #include "MarchingCube/MarchingCube.h"
 
 #define SQUARE_SIDE 20
-#define MIN_ALT 0.5f
+#define MIN_ALT -10.5f
 #define MAX_ALT 100.0f
 
 using namespace std;
 using namespace glm;
+
+
+glm::vec3 lightPos = glm::vec3(0, 10, 20);
 
 typedef unsigned long long ulong64_t;
 
@@ -285,6 +288,11 @@ bool initOpenGL()
 void setCallBacks(GLFWwindow* window)
 {
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 }
 
 void renderLoop()
@@ -292,14 +300,51 @@ void renderLoop()
 
 }
 
-int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("SPH - ^.^");
+void drawGenericObject(GLuint &VAO, GLuint programID,
+                        glm::mat4 proj,
+                        glm::mat4 view,
+                        int size,
+                        bool elemental,
+                        glm::vec3 translationVector = glm::vec3(0,0,0),
+                        glm::vec3 scaleVector = glm::vec3(1,1,1),
+                        GLfloat rotationAngle = 0,
+                        glm::vec3 rotationAxis = glm::vec3(1,0,0))
+{
+    // Must match the name specified in the vertex shader.
+    GLuint matrixID = glGetUniformLocation(programID, "MVP");
+    GLuint modelID = glGetUniformLocation(programID, "model");
+    GLuint lightID = glGetUniformLocation(programID, "LightPos");
 
-    init();
+    // Binding the vertex array is equivalent to setting a global variable for the rest of the gl calls here
+    glBindVertexArray(VAO);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, translationVector);
+    model = glm::scale(model, scaleVector);
+    model = glm::rotate(model, glm::radians(rotationAngle), rotationAxis);
+    glm::mat4 MVP = proj*view*model;
+
+    // Pass our arrays over to the vertexshader for further transformations
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
+    glUniform3fv(lightID, 1, &lightPos[0]);
+    if (elemental) {
+        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
+    } else {
+        glDrawArrays(GL_TRIANGLES, 0, size*3);
+    }
+    // Unbinds the vertex array
+    glBindVertexArray(0);
+}
+
+int main(int argc, char **argv) {
+    // glutInit(&argc, argv);
+    // glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    // glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glutInitWindowPosition(100, 100);
+    // glutCreateWindow("SPH - ^.^");
+
+    // init();
+    // //noglut
 
     if(!glfwInit()) {
         fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -323,12 +368,14 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+    glm::mat4 proj;
+    glm::mat4 view;
 
     const int particleSize = 10;
     sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
@@ -339,15 +386,55 @@ int main(int argc, char **argv) {
 
     vector<ObjectData> spheres;
     GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
+
     for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
         setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
     }
 
-    glutDisplayFunc(display);
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
 
-    glutTimerFunc(DELTA_TIME, update, 0);
-    glutReshapeFunc(reshape);
-    glutMainLoop();
+    while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        // Used for capturing the WASD keys and mouse
+        camera.processInput(window, deltaTime);
+        // Defines what can be seen by the camera along with the clip boundaries of the scene
+        proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
+        view = camera.getCameraView();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glUseProgram(programID);
+        int i = 0;
+        list<Particle> particle_list = sph.getList();
+        // for (auto it = spheres.begin(); it != spheres.end(); it++) {
+        //     drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false, particle_list..getPosition());
+        // }
+        for (Particle &particle : particle_list) {
+            if (i < spheres.size()) {
+                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
+            }
+            i++;
+        }
+        // if (deltaTime > DELTA_TIME) {
+        //     lastFrame = currentFrame;
+        //     update(0);
+        // }
+        // std::cout << i << endl;
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+	glDeleteProgram(programID);
+
+	glfwTerminate();
+
+
+    //glut
+    // glutDisplayFunc(display);
+
+    // glutTimerFunc(DELTA_TIME, update, 0);
+    // glutReshapeFunc(reshape);
+    // glutMainLoop();
 
     return 0;
 }

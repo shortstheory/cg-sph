@@ -30,8 +30,7 @@ Camera::Camera(int screenHeight, int screenWidth, GLfloat x_min, GLfloat x_max, 
     pitch =  0.0f;
     MAX_FOV = 90;
     fov = MAX_FOV;
-    cameraPos = glm::vec3(x_min, y_max, z_min);
-    cameraPos = glm::vec3(0, y_min+3, z_max+5);
+    cameraPos = glm::vec3(0, y_min+3, 5);
     cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 

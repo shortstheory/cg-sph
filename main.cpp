@@ -203,6 +203,11 @@ bool initOpenGL()
     return true;
 }
 
+void setCallBacks(GLFWwindow* window)
+{
+    glfwMakeContextCurrent(window);
+}
+
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -225,8 +230,9 @@ int main(int argc, char **argv) {
     //     glfwTerminate();
     //     return -1;
     // }
-    // // setCallBacks(window);
+    // setCallBacks(window);
     // glewExperimental = true;
+    // std::cout << glewInit();
     // if (glewInit() != GLEW_OK) {
     //     fprintf(stderr, "Failed to initialize GLEW\n");
     //     getchar();
@@ -237,15 +243,15 @@ int main(int argc, char **argv) {
     // glDepthFunc(GL_LESS);
 
     // GLuint programID = LoadShaders("TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader");
+    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 
     const int particleSize = 10;
-    // sph.add(Particle(Vector3D(0, 0, 0), Vector3D(0, 0, 0)));
+    sph.add(Particle(Vector3D(0, 0, 0), Vector3D(0, 0, 0)));
     for (int i = 0; i < particleSize; i+=1 )
         for (int j = 0; j < particleSize; j+=1)
             for (int k = 0; k < particleSize; k+=1)
                 sph.add(Particle(Vector3D(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), Vector3D(0, 0, 0)));
-    //sph.add(Particle(Vector3D(0 + i, 0 + j * 0.8, 0 + k), Vector3D(0, 0, 0)));
 
     glutDisplayFunc(display);
 

@@ -166,7 +166,7 @@ void update(int value) {
         pos_pre = pos_now;
         sph.setBase(delta);
 
-        		printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
+        		// printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
     }
 
     // cout movement

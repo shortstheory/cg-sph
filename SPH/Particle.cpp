@@ -1,5 +1,6 @@
 #include "Particle.h"
 #include <stdio.h>
+#include <iostream>
 
 const double KERNAL_POLY_CONSTANT = 4.921875;
 const double KERNAL_POLY_GRAD_CONSTANT = -9.4000888;
@@ -27,7 +28,8 @@ void Particle::countPressure(const vector<Particle> &neighbour, const vector<dou
 
 void Particle::countForce(const vector<Particle> &neighbour, const vector<double> &r) {
     force = vec3(0, 0, 0);
-    int l = neighbour.size();		
+    int l = neighbour.size();
+    // printf("LVALUE %d\n", l);	
     for (int i = 0; i < l; ++i) {
         force += (float)(mass * 0.5 / density *  (pressure + neighbour[i].getPressure())) * KernalSpik(neighbour[i], r[i]);
     }
@@ -57,7 +59,7 @@ void Particle::countColorfield(const vector<Particle> &neighbour, const vector<d
 void Particle::countVelocity(const vec3 &base_move) {
     vec3 acce = (force + viscosity + tenssion) * 1.0f/(float)density;
     acce[1] += g;
-    velocity += acce * (float)(DELTA_TIME/1000) + base_move * (float)(1.0f/DELTA_TIME) * 200.0f;	
+    velocity += acce * (float)(DELTA_TIME/1000.0f) + base_move * (float)(1.0f/DELTA_TIME) * 200.0f;	
 }
 
 void Particle::move() {

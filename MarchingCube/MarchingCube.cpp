@@ -14,7 +14,7 @@ using namespace std;
  *  + y + z
  */
 
-MarchingCube::MarchingCube(const double _bound[], double _l, list<Particle> *_particles):
+MarchingCube::MarchingCube(const vec3 _bound, double _l, list<Particle> *_particles):
     bound(_bound), l(_l),
     sum_v((1 + (int)(_bound[0] * 2 / _l)) * (1 + (int)(_bound[1] * 2 / _l)) * (1 + (int)(_bound[2] * 2 / _l))),
     sum_e((1 + (int)(_bound[0] * 2 / _l)) * (1 + (int)(_bound[1] * 2 / _l)) * (1 + (int)(_bound[2] * 2 / _l)) * 3),

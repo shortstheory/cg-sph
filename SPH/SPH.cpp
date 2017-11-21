@@ -53,5 +53,5 @@ void SPH::move() {
     }
 
     // reset container movement
-    base_move = Vector3D(0.0f, 0.0f, 0.0f);
+    base_move = vec3(0.0f, 0.0f, 0.0f);
 }

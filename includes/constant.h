@@ -1,7 +1,13 @@
 #ifndef CONSTANT_H
 #define CONSTANT_H
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
 #pragma once
+
+using namespace glm;
 
 const int PARTICLE_MAX = 1000;
 const double PARTICLE_RADIUS = 0.045f;
@@ -26,7 +32,8 @@ const float color4_sphere[] = {0.5f, 0, 0, 1};
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-const double FRAME_LENGTH[3] = {0.8, 0.8, 0.8};
+// const double FRAME_LENGTH[3] = {0.8, 0.8, 0.8};
+const vec3 FRAME_LENGTH(0.8, 0.8, 0.8);
 const double FRAME_BASE_INIT[3] = {0, -0.25f, -2.3};
 const double WALL_EDGE[12][3] = {
 	{ - FRAME_LENGTH[0], 0                ,   FRAME_LENGTH[2]},

@@ -8,7 +8,7 @@
 #include "../includes/constant.h"
 #include "lookup_list.h"
 #include "../SPH/Particle.h"
-#include "../includes/vector3D.h"
+// #include "../includes/vec3.h"
 
 using namespace std;
 using namespace glm;
@@ -16,25 +16,25 @@ using namespace glm;
 class MarchingCube {
     public:
         MarchingCube() {}
-        MarchingCube(const double _bound[], double _l, list<Particle> *_particles);
+        MarchingCube(const vec3 _bound, double _l, list<Particle> *_particles);
         ~MarchingCube();
 
         // count the mesh
-        void count(vector<Vector3D> &vertexs, vector<int> &tri_index);
+        void count(vector<vec3> &vertexs, vector<int> &tri_index);
 
     private:
         // return the closeset particle if there is a particle contain this vertex, otherwise NULL
-        Particle* check(Vector3D v) const;
+        Particle* check(vec3 v) const;
 
         // if one in one not, return the one in, otherwise, return NULL
         Particle* diff(Particle* a, Particle* b) const;
 
         // return the intersect point one the edge
-        Vector3D* countInter(const Vector3D &v, const Vector3D &u, Particle* tmp) const;
+        vec3* countInter(const vec3 &v, const vec3 &u, Particle* tmp) const;
 
     private:
         // position and size of the container
-        Vector3D base, bound;
+        vec3 base, bound;
         // edge length of the cube
         double l;
         // number of edges on each coordinate
@@ -49,7 +49,7 @@ class MarchingCube {
             point to the cut point if intersect with the mesh, otherwise NULL
             edge are numbered by related vetex towards z, y, x
          */
-        vector<Vector3D*> intersections;
+        vector<vec3*> intersections;
         // related index offset for twelve edges in a cube
         vector<int> offset_edge;
         // related index offset for two edge that is one step different on each coordinate

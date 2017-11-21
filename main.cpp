@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "includes/constant.h"
-#include "includes/vector3D.h"
+// #include "includes/vector3D.h"
 #include "includes/shader.h"
 #include "SPH/SPH.h"
 #include "MarchingCube/MarchingCube.h"
@@ -31,8 +31,8 @@ SPH sph;
 
 bool debug = false;
 bool is_press = false;
-Vector3D pos_pre, pos_now;
-double frame_base[3];
+vec3 pos_pre, pos_now;
+vec3 frame_base;
 
 // initiate, set color and lighting
 void init() {
@@ -99,7 +99,7 @@ void drawEdge(const double _pos[], const double _scale[]) {
 }
 
 // draw sphere for particle mode/debug mode
-void drawSphere(const Vector3D _pos) {
+void drawSphere(const vec3 _pos) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glPushMatrix();
@@ -130,7 +130,7 @@ void display() {
     } else {
         // mesh for fuild simulation
         list<Particle> particle_list = sph.getList();
-        vector<Vector3D> v_list;
+        vector<vec3> v_list;
         vector<int> index_list;
         MarchingCube marching_cube(FRAME_LENGTH, GRID_LENGTH, &particle_list);
         marching_cube.count(v_list, index_list);
@@ -154,8 +154,8 @@ void display() {
 void update(int value) {
     // move speed
     if (pos_now[0] != pos_pre[0] || pos_now[1] != pos_pre[1] || pos_now[2] != pos_pre[2]) {
-        Vector3D delta = pos_now - pos_pre;
-        Vector3D base_new = Vector3D(frame_base) + delta;
+        vec3 delta = pos_now - pos_pre;
+        vec3 base_new = vec3(frame_base) + delta;
         for (int i = 0; i < 2; ++i) {
             if (abs(base_new[i]) > FRAME_LENGTH[i] * 2) {
                 base_new[i] = base_new[i] / abs(base_new[i]) * (FRAME_LENGTH[i] - 0.0001);
@@ -175,9 +175,9 @@ void update(int value) {
     glutPostRedisplay();
 }
 
-Vector3D coordinateTrans(int x, int y) {
+vec3 coordinateTrans(int x, int y) {
     x -= WINDOW_WIDTH / 2; y -= WINDOW_HEIGHT / 2;
-    return Vector3D((x + 0.0) / WINDOW_WIDTH * (FRAME_LENGTH[0] * 2.2f), (y + 0.0) / WINDOW_HEIGHT * (FRAME_LENGTH[1] * 2.2f) * -1, 0);
+    return vec3((x + 0.0) / WINDOW_WIDTH * (FRAME_LENGTH[0] * 2.2f), (y + 0.0) / WINDOW_HEIGHT * (FRAME_LENGTH[1] * 2.2f) * -1, 0);
 }
 
 // mouse event detect for container movement
@@ -248,11 +248,11 @@ int main(int argc, char **argv) {
 
 
     const int particleSize = 10;
-    sph.add(Particle(Vector3D(0, 0, 0), Vector3D(0, 0, 0)));
+    sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
     for (int i = 0; i < particleSize; i+=1 )
         for (int j = 0; j < particleSize; j+=1)
             for (int k = 0; k < particleSize; k+=1)
-                sph.add(Particle(Vector3D(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), Vector3D(0, 0, 0)));
+                sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
 
     glutDisplayFunc(display);
 

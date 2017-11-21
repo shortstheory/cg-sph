@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include "../includes/constant.h"
-#include "../includes/vector3D.h"
+// #include "../includes/vector3D.h"
 #include "Particle.h"
 
 using namespace std;
@@ -15,7 +15,7 @@ using namespace glm;
 class SPH {
     public:
         SPH() {}
-        SPH(const double _bound[]): particle_list(0), bound(_bound), base_move(0.0f, 0.0f, 0.0f) {}
+        SPH(const vec3 _bound): particle_list(0), bound(_bound), base_move(0.0f, 0.0f, 0.0f) {}
 
         // add a new particle to the SPH system
         void add(Particle _particle) {
@@ -28,7 +28,7 @@ class SPH {
         }
 
         // set the recent container movement
-        void setBase(const Vector3D &base_vec) {
+        void setBase(const vec3 &base_vec) {
             base_move = base_vec;
         }
 
@@ -49,9 +49,9 @@ class SPH {
         // list of particles
         list<Particle> particle_list;
         // boundary for the container
-        Vector3D bound;
+        vec3 bound;
         // recent movement of the container
-        Vector3D base_move;
+        vec3 base_move;
 };
 
 #endif

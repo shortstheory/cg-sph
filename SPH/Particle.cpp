@@ -9,7 +9,7 @@ const double KERNAL_VISC_LAPLACIAN_CONSTANT = 14.323944878;
 using namespace std;
 
 Particle::Particle(): position(0.0f, 0.0f, 0.0f), velocity(0.0f, 0.0f, 0.0f) {}
-Particle::Particle(const Vector3D &_position, const Vector3D &_velocity): position(_position), velocity(_velocity) {}
+Particle::Particle(const vec3 &_position, const vec3 &_velocity): position(_position), velocity(_velocity) {}
 
 void Particle::countDensity(const vector<Particle> &neighbour, const vector<double> &r) {
     density = mass * KERNAL_POLY_CONSTANT / pow(SMOOTHING_WIDTH, 3);
@@ -25,37 +25,38 @@ void Particle::countPressure(const vector<Particle> &neighbour, const vector<dou
 }
 
 void Particle::countForce(const vector<Particle> &neighbour, const vector<double> &r) {
-    force = Vector3D(0, 0, 0);
+    force = vec3(0, 0, 0);
     int l = neighbour.size();		
     for (int i = 0; i < l; ++i) {
-        force += mass * 0.5 / density * KernalSpik(neighbour[i], r[i]) * (pressure + neighbour[i].getPressure());
+        force += (float)(mass * 0.5 / density *  (pressure + neighbour[i].getPressure())) * KernalSpik(neighbour[i], r[i]);
     }
 }
 
 void Particle::countViscosity(const vector<Particle> &neighbour, const vector<double> &r) {
-    viscosity = Vector3D(0.0f, 0.0f, 0.0f);
+    viscosity = vec3(0.0f, 0.0f, 0.0f);
     int l = neighbour.size();		
     for (int i = 0; i < l; ++i) {
-        viscosity += mass / density * (neighbour[i].getVelocity() - velocity) * KernalVisc(neighbour[i], r[i]) * 3e-4;
+        viscosity += (float)(mass / density * KernalVisc(neighbour[i], r[i]) * 3e-4) * (neighbour[i].getVelocity() - velocity);
     }
 }
 
 void Particle::countColorfield(const vector<Particle> &neighbour, const vector<double> &r) {
-    Vector3D color_grad(0.0f, 0.0f, 0.0f);
+    vec3 color_grad(0.0f, 0.0f, 0.0f);
     double color_lap = 0;
-    int l = neighbour.size();		
+    int l = neighbour.size();
+    float ratio = mass / density;
     for (int i = 0; i < l; ++i) {
-        color_grad += mass / density * KernalPolyGrad(neighbour[i], r[i]);
-        color_lap += mass / density * KernalPolyLap(neighbour[i], r[i]);
+        color_grad += ratio * KernalPolyGrad(neighbour[i], r[i]);
+        color_lap += ratio * KernalPolyLap(neighbour[i], r[i]);
     }
-    if (color_grad.norm() > 1e-6) tenssion = - color_lap * color_grad.unit() * 1e-4;
-    else tenssion = Vector3D(0.0f, 0.0f, 0.0f);
+    if (normalize(color_grad) > 1e-6) tenssion = - color_lap * color_grad.unit() * 1e-4;
+    else tenssion = vec3(0.0f, 0.0f, 0.0f);
 }
 
-void Particle::countVelocity(const Vector3D &base_move) {
-    Vector3D acce = (force + viscosity + tenssion) / density;
+void Particle::countVelocity(const vec3 &base_move) {
+    vec3 acce = (force + viscosity + tenssion) * 1.0f/(float)density;
     acce[1] += g;
-    velocity += acce * DELTA_TIME / 1000 + base_move / DELTA_TIME * 200;	
+    velocity += acce * (float)(DELTA_TIME/1000) + base_move * (float)(1.0f/DELTA_TIME) * 200.0f;	
 }
 
 void Particle::move() {
@@ -68,7 +69,7 @@ void Particle::move() {
     //printf("density: %lf\n", density);
     //printf("pressure: %lf\n", pressure);
 }
-void Particle::check(const Vector3D &bound) {
+void Particle::check(const vec3 &bound) {
     for (int i = 0; i < 3; ++i) {
         if (abs(position[i]) > bound[i] - 1e-6) {
             position[i] = bound[i] * (position[i] / abs(position[i])) * 2 - position[i];
@@ -89,12 +90,12 @@ double Particle::KernalPolyLap(const Particle &_particle, double r) const {
     return KERNAL_POLY_LAP_CONSTANT / pow(SMOOTHING_WIDTH, 9) * (SMOOTHING_WIDTH2 - r * r) * (7.0f * r * r - 3.0f * SMOOTHING_WIDTH2);
 }
 
-Vector3D Particle::KernalPolyGrad(const Particle &_particle, double r) const {
-    return KERNAL_POLY_GRAD_CONSTANT / pow(SMOOTHING_WIDTH, 9) * pow(SMOOTHING_WIDTH2 - r * r, 2) * (_particle.getPosition() - position);
+vec3 Particle::KernalPolyGrad(const Particle &_particle, double r) const {
+    return (float)(KERNAL_POLY_GRAD_CONSTANT / pow(SMOOTHING_WIDTH, 9) * pow(SMOOTHING_WIDTH2 - r * r, 2)) * (_particle.getPosition() - position);
 }
 
-Vector3D Particle::KernalSpik(const Particle &_particle, double r) const {
-    return KERNAL_SPIK_GRAD_CONSTANT / pow(SMOOTHING_WIDTH, 6) * pow(SMOOTHING_WIDTH - r, 2) * (_particle.getPosition() - position);
+vec3 Particle::KernalSpik(const Particle &_particle, double r) const {
+    return (float)(KERNAL_SPIK_GRAD_CONSTANT / pow(SMOOTHING_WIDTH, 6) * pow(SMOOTHING_WIDTH - r, 2)) * (_particle.getPosition() - position);
 }
 
 double Particle::KernalVisc(const Particle &_particle, double r) const {

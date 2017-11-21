@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <chrono>
 #include <vector>
 
 #include "includes/constant.h"
@@ -27,12 +28,12 @@
 #include "MarchingCube/MarchingCube.h"
 
 #define SQUARE_SIDE 20
-#define MIN_ALT -10.5f
+#define MIN_ALT 0.5f
 #define MAX_ALT 100.0f
 
 using namespace std;
 using namespace glm;
-
+using namespace chrono;
 
 glm::vec3 lightPos = glm::vec3(0, 10, 20);
 
@@ -248,26 +249,27 @@ void display() {
 // update for each frame
 void update(int value) {
     // move speed
-    if (pos_now[0] != pos_pre[0] || pos_now[1] != pos_pre[1] || pos_now[2] != pos_pre[2]) {
-        vec3 delta = pos_now - pos_pre;
-        vec3 base_new = vec3(frame_base) + delta;
-        for (int i = 0; i < 2; ++i) {
-            if (abs(base_new[i]) > FRAME_LENGTH[i] * 2) {
-                base_new[i] = base_new[i] / abs(base_new[i]) * (FRAME_LENGTH[i] - 0.0001);
-            }
-        }
-        delta = base_new - frame_base;
-        for (int i = 0; i < 3; ++i) frame_base[i] = base_new[i];
-        pos_pre = pos_now;
-        sph.setBase(delta);
-
-        		// printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
-    }
+    cout << "SADUPDATE"<<endl;
+    // if (pos_now[0] != pos_pre[0] || pos_now[1] != pos_pre[1] || pos_now[2] != pos_pre[2]) {
+    //     cout <<"INTUDAS"<<endl;
+    //     vec3 delta = pos_now - pos_pre;
+    //     vec3 base_new = vec3(frame_base) + delta;
+    //     for (int i = 0; i < 2; ++i) {
+    //         if (abs(base_new[i]) > FRAME_LENGTH[i] * 2) {
+    //             base_new[i] = base_new[i] / abs(base_new[i]) * (FRAME_LENGTH[i] - 0.0001);
+    //         }
+    //     }
+    //     delta = base_new - frame_base;
+    //     for (int i = 0; i < 3; ++i) frame_base[i] = base_new[i];
+    //     pos_pre = pos_now;
+    //     sph.setBase(delta);
+    //     printf("base %lf, %lf, %lf\n", frame_base[0], frame_base[1], frame_base[2]);
+    // }
 
     // cout movement
     sph.move();
-    glutTimerFunc(DELTA_TIME, update, 0);
-    glutPostRedisplay();
+    // glutTimerFunc(DELTA_TIME, update, 0);
+    // glutPostRedisplay();
 }
 
 vec3 coordinateTrans(int x, int y) {
@@ -394,9 +396,20 @@ int main(int argc, char **argv) {
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
+    milliseconds ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+    int startTime = ms.count();
+
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
+
+        int64_t currentFrameTime = duration_cast< milliseconds >(system_clock::now().time_since_epoch()).count();
+        int64_t frameDeltaTime = currentFrameTime - startTime;
         deltaTime = currentFrame - lastFrame;
+        if (deltaTime > DELTA_TIME/10.0f) {
+            cout << deltaTime << endl;
+            lastFrame = currentFrame;
+            update(0);
+        }
         // Used for capturing the WASD keys and mouse
         camera.processInput(window, deltaTime);
         // Defines what can be seen by the camera along with the clip boundaries of the scene
@@ -413,14 +426,12 @@ int main(int argc, char **argv) {
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition());
+                // cout << particle.getPosition().x << ' ' << particle.getPosition().y << ' '<< particle.getPosition().z << ' ';
             }
             i++;
         }
-        // if (deltaTime > DELTA_TIME) {
-        //     lastFrame = currentFrame;
-        //     update(0);
-        // }
-        // std::cout << i << endl;
+        // cout << endl << "BREAK" << endl;
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

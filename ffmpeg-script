@@ -1,0 +1,1 @@
+ffmpeg -i 'img-%03d.bmp' -r 60 out2.mkv

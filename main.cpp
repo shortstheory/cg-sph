@@ -1,3 +1,4 @@
+#include <FreeImage.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
@@ -18,11 +19,11 @@
 #include <math.h>
 #include <chrono>
 #include <vector>
+#include <png.h>
 
 #include "includes/constant.h"
 #include "includes/Camera.h"
 #include "includes/sphere.h"
-// #include "includes/vector3D.h"
 #include "includes/shader.h"
 #include "SPH/SPH.h"
 #include "MarchingCube/MarchingCube.h"
@@ -30,7 +31,7 @@
 #define SQUARE_SIDE 20
 #define MIN_ALT 0.5f
 #define MAX_ALT 100.0f
-#define GLUT false
+#define OFFSCREEN true
 
 using namespace std;
 using namespace glm;
@@ -194,19 +195,65 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glBindVertexArray(0);
 }
 
-void initFrameBuffers(GLuint &fbo, GLuint &render_buf)
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer)
 {
     glGenFramebuffers(1,&fbo);
-    glGenRenderbuffers(1,&render_buf);
-    glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_BGRA, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    glGenRenderbuffers(1,&colorBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
+
+    // glGenRenderbuffers(1, &depthBuffer);
+    // glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+static png_byte *png_bytes = NULL;
+static png_byte **png_rows = NULL;
+static void screenshot_png(const char *filename, unsigned int width, unsigned int height,
+        GLubyte **pixels, png_byte **png_bytes, png_byte ***png_rows) {
+    size_t i, nvals;
+    const size_t format_nchannels = 4;
+    FILE *f = fopen(filename, "wb");
+    nvals = format_nchannels * width * height;
+    *pixels = (GLubyte*)realloc(*pixels, nvals * sizeof(GLubyte));
+    *png_bytes = (png_byte*)realloc(*png_bytes, nvals * sizeof(png_byte));
+    *png_rows = (png_byte**)realloc(*png_rows, height * sizeof(png_byte*));
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, *pixels);
+    for (i = 0; i < nvals; i++)
+        (*png_bytes)[i] = (*pixels)[i];
+    for (i = 0; i < height; i++)
+        (*png_rows)[height - i - 1] = &(*png_bytes)[i * width * format_nchannels];
+    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png) abort();
+    png_infop info = png_create_info_struct(png);
+    if (!info) abort();
+    if (setjmp(png_jmpbuf(png))) abort();
+    png_init_io(png, f);
+    png_set_IHDR(
+        png,
+        info,
+        width,
+        height,
+        8,
+        PNG_COLOR_TYPE_RGBA,
+        PNG_INTERLACE_NONE,
+        PNG_COMPRESSION_TYPE_DEFAULT,
+        PNG_FILTER_TYPE_DEFAULT
+    );
+    png_write_info(png, info);
+    png_write_image(png, *png_rows);
+    png_write_end(png, NULL);
+    fclose(f);
 }
 
 int main(int argc, char **argv) {
-    const int particleSize = 10;
+    const int particleSize = 20;
     sph = SPH(FRAME_LENGTH);
     sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
     for (int i = 0; i < particleSize; i+=1 )
@@ -245,8 +292,6 @@ int main(int argc, char **argv) {
     glm::mat4 proj;
     glm::mat4 view;
 
-    GLuint fbo, render_buf;
-    initFrameBuffers(fbo, render_buf);
 
     vector<ObjectData> spheres;
     GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
@@ -257,7 +302,10 @@ int main(int argc, char **argv) {
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-
+    GLuint fbo=0, colorBuffer, depthBuffer;
+    initFrameBuffers(fbo, colorBuffer, depthBuffer);
+    glUseProgram(programID);
+    int k = 0;
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -268,11 +316,16 @@ int main(int argc, char **argv) {
         // Defines what can be seen by the camera along with the clip boundaries of the scene
         proj = glm::perspective(glm::radians(camera.getFOV()), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.2f, 500.0f);
         view = camera.getCameraView();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(programID);
         int i = 0;
         list<Particle> particle_list = sph.getList();
+        
+        //rendering part
+        if (OFFSCREEN) {
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+        } else {
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        }
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
@@ -280,12 +333,35 @@ int main(int argc, char **argv) {
             }
             i++;
         }
+        
+        if (OFFSCREEN) {
+            uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
+            glReadBuffer(GL_COLOR_ATTACHMENT0);
+            glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGB,GL_UNSIGNED_BYTE,&data[0]);
+            FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
+            k++;
+
+            char imgNum[4];
+            string imVal;
+            sprintf(imgNum, "img-%03d",k);
+            for (int u = 0; imgNum[u] != '\0'; u++) {
+                imVal += imgNum[u];
+            }
+            string imgName = "img/" + imVal + ".bmp";
+
+            cout<<imgName<<endl;
+            FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
+            FreeImage_Save(FIF_BMP, image, "test.bmp", 0);
+        }
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 	glDeleteProgram(programID);
-    glDeleteFramebuffers(1,&fbo);
-    glDeleteRenderbuffers(1,&render_buf);
-	glfwTerminate();
+    // glDeleteFramebuffers(1,&fbo);
+    // glDeleteRenderbuffers(1,&colorBuffer);
+	// glDeleteRenderbuffers(1,&depthBuffer);
+    glfwTerminate();
     return 0;
 }

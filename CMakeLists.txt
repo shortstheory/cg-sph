@@ -19,4 +19,4 @@ find_package(assimp REQUIRED)
 find_package(GLUT REQUIRED)
 
 include_directories(${OPENGL_INCLUDE_DIRS})
-target_link_libraries(cg_sph ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} glfw GLEW assimp dl)
+target_link_libraries(cg_sph ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} glfw GLEW assimp freeimage png dl)

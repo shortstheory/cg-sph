@@ -68,7 +68,7 @@ void Particle::move() {
     // printf("tenssion: %lf, %lf, %lf\n", tenssion[0], tenssion[1], tenssion[2]);
     // printf("velocity0: %lf, %lf, %lf\n", velocity[0], velocity[1], velocity[2]);		
     position += velocity * (float)(DELTA_TIME / 1000.0f);
-    printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
+    // printf("position: %lf, %lf, %lf\n", position[0], position[1], position[2]);
     // printf("density: %lf\n", density);
     // printf("pressure: %lf\n", pressure);
 }

@@ -194,6 +194,17 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glBindVertexArray(0);
 }
 
+void initFrameBuffers(GLuint &fbo, GLuint &render_buf)
+{
+    glGenFramebuffers(1,&fbo);
+    glGenRenderbuffers(1,&render_buf);
+    glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_BGRA, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+}
+
 int main(int argc, char **argv) {
     const int particleSize = 10;
     sph = SPH(FRAME_LENGTH);
@@ -234,7 +245,8 @@ int main(int argc, char **argv) {
     glm::mat4 proj;
     glm::mat4 view;
 
-
+    GLuint fbo, render_buf;
+    initFrameBuffers(fbo, render_buf);
 
     vector<ObjectData> spheres;
     GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
@@ -249,8 +261,8 @@ int main(int argc, char **argv) {
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
-        currentFrame = lastFrame;        
-        sph.move();
+            currentFrame = lastFrame;        
+            sph.move();
         // Used for capturing the WASD keys and mouse
         camera.processInput(window, deltaTime);
         // Defines what can be seen by the camera along with the clip boundaries of the scene
@@ -261,6 +273,7 @@ int main(int argc, char **argv) {
         glUseProgram(programID);
         int i = 0;
         list<Particle> particle_list = sph.getList();
+        
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,4,0));
@@ -271,7 +284,8 @@ int main(int argc, char **argv) {
         glfwPollEvents();
     }
 	glDeleteProgram(programID);
-
+    glDeleteFramebuffers(1,&fbo);
+    glDeleteRenderbuffers(1,&render_buf);
 	glfwTerminate();
     return 0;
 }

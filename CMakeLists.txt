@@ -1,4 +1,4 @@
- # sudo apt install libglfw3 libglew-dev glew-utils libglew2.0 assimp-utils libassimp-dev libassimp3v5 freeglut3-dev
+ # sudo apt install libglfw3 libglew-dev glew-utils libglew2.0 assimp-utils libassimp-dev libassimp3v5 freeglut3-dev libxmu-dev libxi-dev libfreeimage-dev
 
 cmake_minimum_required(VERSION 3.2)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
 project(opengl_assignment)
 
-add_executable(cg_sph main.cpp "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp" "includes/shader.cpp" "includes/constant.h" "includes/Camera.cpp" 
+add_executable(cg_sph main.cpp "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp" "includes/shader.cpp" "includes/constant.h" "includes/Camera.cpp"
                 "includes/icosahedron.cpp" "includes/cube.cpp" "includes/mesh.cpp" "includes/utilities.cpp" "includes/sphere.cpp")
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/includes/ColorFragmentShader.fragmentshader
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

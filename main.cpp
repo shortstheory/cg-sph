@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
-            currentFrame = lastFrame;        
+            currentFrame = lastFrame;
             sph.move();
         // Used for capturing the WASD keys and mouse
         if (!OFFSCREEN) {
@@ -277,7 +277,7 @@ int main(int argc, char **argv) {
         view = camera.getCameraView();
         int i = 0;
         list<Particle> particle_list = sph.getList();
-        
+
         //rendering part
         if (OFFSCREEN) {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
@@ -285,14 +285,14 @@ int main(int argc, char **argv) {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,4,0));
             }
             i++;
         }
-        
+
         if (OFFSCREEN) {
             uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
             glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -314,7 +314,7 @@ int main(int argc, char **argv) {
 
         }
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

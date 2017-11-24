@@ -33,7 +33,7 @@ const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
 // const double FRAME_LENGTH[3] = {0.8, 0.8, 0.8};
-const vec3 FRAME_LENGTH(0.8, 0.8, 0.8);
+const vec3 FRAME_LENGTH(1.8, 1.8, 1.8);
 const double FRAME_BASE_INIT[3] = {0, -0.25f, -2.3};
 const double WALL_EDGE[12][3] = {
 	{ - FRAME_LENGTH[0], 0                ,   FRAME_LENGTH[2]},

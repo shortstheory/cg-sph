@@ -12,6 +12,7 @@ class Mesh
 {
 private:
     vector<GLfloat> vertices;
+    vector<GLuint> indices;
     vector<Triangle> triangles;
     vector<glm::vec3> normals;
 

@@ -43,6 +43,7 @@ glm::vec3 lightPos = glm::vec3(0, 10, 20);
 typedef unsigned long long ulong64_t;
 
 const int particleSize = 5;
+const float sphereSize = 0.03f;
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;
 const GLfloat y_min = MIN_ALT;
@@ -62,6 +63,24 @@ vec3 frame_base;
 struct ObjectData {
     GLuint ModelArrayID, ModelVBO, ModelColorVBO, ModelNormalVBO, EBO, indexSize;
 };
+
+GLfloat boundingCubeVertices[] = {
+	-0.5,-0.5,0.5,
+	0.5,-0.5,0.5,
+	0.5,0.5,0.5,
+	-0.5,0.5,0.5, 
+    -0.5,-0.5,0.5
+//first face
+	// -0.5,-0.5,-0.5,
+    // 0.5,-0.5,-0.5,
+    // 0.5,-0.5,0.5
+	// -0.5,0.5,-0.5,
+	// 0.5,0.5,-0.5,
+	// 0.5,0.5,0.5
+};
+
+const int boundingCubeSize = 5;
+
 
 void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVector)
 {
@@ -168,6 +187,58 @@ void setupMeshVAO(Mesh mesh, GLfloat* color_vector, ObjectData &object)
     glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(ModelNormalArray), ModelNormalArray, GL_STATIC_DRAW);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    glBindVertexArray(0);
+}
+
+void setupPrimitiveVAO(GLfloat* vertices, GLfloat* color_vector, int vertexCount, ObjectData &object)
+{
+    object.indexSize = vertexCount; //# of vertices = arraysize/3 (x,y,z)
+    int size = vertexCount*sizeof(GLfloat)*3;
+
+    GLfloat ModelColorArray[vertexCount*3];
+    // GLfloat ModelNormalArray[normals.size()*3];
+
+    ulong64_t i = 0;
+ 
+ 
+    // Working with a regular array is easier than working with vectors for passing on to the VS/FS
+    // for (auto it = normals.begin(); it != normals.end(); it++) {
+    //     ModelNormalArray[i++] = it->x;
+    //     ModelNormalArray[i++] = it->y;
+    //     ModelNormalArray[i++] = it->z;
+    // }
+
+    for (i = 0; i < vertexCount*3; i++) {
+        for (int ctr = 0; ctr < 3; ctr++) {
+            ModelColorArray[i++] = color_vector[ctr];
+        }
+    }
+
+    // We are only generating one VA at a time for each object
+    glGenVertexArrays(1, &(object.ModelArrayID));
+    glBindVertexArray(object.ModelArrayID);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    // glEnableVertexAttribArray(2);
+
+    // Separate buffers are created for the vertex buffer, color buffer, and normal buffer of the 3D object
+    // These buffers store the data and forward it on to the GPU to be processed further by the VS/FS
+    glGenBuffers(1, &(object.ModelVBO));
+    glBindBuffer(GL_ARRAY_BUFFER, object.ModelVBO);
+    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glGenBuffers(1, &(object.ModelColorVBO));
+    glBindBuffer(GL_ARRAY_BUFFER, object.ModelColorVBO);
+    glBufferData(GL_ARRAY_BUFFER, size, color_vector, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // glGenBuffers(1, &(object.ModelNormalVBO));
+    // glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(ModelNormalArray), ModelNormalArray, GL_STATIC_DRAW);
+    // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(0);
@@ -271,7 +342,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < particleSize; i+=1 )
         for (int j = 0; j < particleSize; j+=1)
             for (int k = 0; k < particleSize; k+=1)
-                sph.add(Particle(vec3(-0.50 + i * 0.03, -0.2 + j * 0.03, -0.05 + k * 0.03), vec3(0, 0, 0)));
+                sph.add(Particle(vec3(-0.00 + i * sphereSize, -0.0 + j * sphereSize, -0.00 + k * sphereSize), vec3(0, 0, 0)));
 
     if(!glfwInit()) {
         fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -310,10 +381,11 @@ int main(int argc, char **argv) {
     GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
 
     for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
-        setupMeshVAO(Sphere(0.03f, 3).getMesh(), colorArray, spheres);
+        setupMeshVAO(Sphere(sphereSize, 3).getMesh(), colorArray, spheres);
     }
 
-    setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
+    // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
+    setupPrimitiveVAO(boundingCubeVertices, colorArray, boundingCubeSize, boundingCube);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;

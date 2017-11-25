@@ -26,6 +26,7 @@
 #include "includes/sphere.h"
 #include "includes/shader.h"
 #include "includes/cube.h"
+#include "includes/scene.h"
 #include "SPH/SPH.h"
 #include "MarchingCube/MarchingCube.h"
 
@@ -382,7 +383,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    glClearColor(0.5f, 0.4f, 0.2f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -393,12 +394,24 @@ int main(int argc, char **argv) {
 
 
     vector<ObjectData> spheres;
+    vector<ObjectData> floorObjectVector;
     ObjectData boundingCube;
+    Scene floorScene;
+    floorScene.addFloor(vec4(x_min, x_max, z_min, z_max));
+    vector<Mesh> floorMesh = floorScene.getMesh();
     GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
 
     for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
         setupMeshVAO(Sphere(sphereSize, 3).getMesh(), colorArray, spheres);
     }
+
+    // for (auto it = floorScene.getMesh().begin(); it != floorScene.getMesh().end(); it++) {
+    //     setupMeshVAO(*it, colorArray, floorObjectVector);
+    // }
+    for (int i = 0; i < floorMesh.size(); i++) {
+        setupMeshVAO(floorMesh.at(i), colorArray, floorObjectVector);
+    }
+    cout << "floormesh" << floorObjectVector.size();
 
     // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
     setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, colorArray, boundingCubeSize, boundingCube);
@@ -438,6 +451,10 @@ int main(int argc, char **argv) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,1.8f,0));
             }
             i++;
+        }
+
+        for (auto it = floorObjectVector.begin(); it != floorObjectVector.end(); it++) {
+            drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
         }
 
         if (OFFSCREEN) {

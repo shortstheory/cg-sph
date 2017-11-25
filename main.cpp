@@ -91,7 +91,7 @@ unsigned int boundingCubeIndices[] = {
 };
 
 const int boundingCubeSize = 8;
-const int boundingIndicesSize = 12;
+const int boundingIndicesSize = 24;
 
 
 void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVector)
@@ -249,7 +249,7 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
 
     glGenBuffers(1, &(object.EBO));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, boundingIndicesSize, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, boundingIndicesSize*sizeof(GLuint), indices, GL_STATIC_DRAW);
 
     // glGenBuffers(1, &(object.ModelNormalVBO));
     // glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);

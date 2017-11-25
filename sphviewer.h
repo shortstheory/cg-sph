@@ -81,5 +81,27 @@ unsigned int boundingCubeIndices[] = {
 const int boundingCubeSize = 8;
 const int boundingIndicesSize = 24;
 
+void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVector);
+void setupMeshVAO(Mesh mesh, GLfloat* color_vector, ObjectData &object);
+void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector, int vertexCount, ObjectData &object);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer);
+void setCallBacks(GLFWwindow* window);
+void drawGenericObject(GLuint &VAO, GLuint programID,
+                        glm::mat4 proj,
+                        glm::mat4 view,
+                        int size,
+                        bool elemental,
+                        glm::vec3 translationVector = glm::vec3(0,0,0),
+                        glm::vec3 scaleVector = glm::vec3(1,1,1),
+                        GLfloat rotationAngle = 0,
+                        glm::vec3 rotationAxis = glm::vec3(1,0,0));
+
+bool initOpenGL();
+
+
+
 
 #endif

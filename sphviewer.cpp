@@ -217,20 +217,15 @@ void setCallBacks(GLFWwindow* window)
     }
 }
 
-void renderLoop()
-{
-
-}
-
 void drawGenericObject(GLuint &VAO, GLuint programID,
                         glm::mat4 proj,
                         glm::mat4 view,
                         int size,
                         bool elemental,
-                        glm::vec3 translationVector = glm::vec3(0,0,0),
-                        glm::vec3 scaleVector = glm::vec3(1,1,1),
-                        GLfloat rotationAngle = 0,
-                        glm::vec3 rotationAxis = glm::vec3(1,0,0))
+                        glm::vec3 translationVector,
+                        glm::vec3 scaleVector,
+                        GLfloat rotationAngle,
+                        glm::vec3 rotationAxis)
 {
     // Must match the name specified in the vertex shader.
     GLuint matrixID = glGetUniformLocation(programID, "MVP");

@@ -69,17 +69,29 @@ GLfloat boundingCubeVertices[] = {
 	0.5,-0.5,0.5,
 	0.5,0.5,0.5,
 	-0.5,0.5,0.5, 
-    -0.5,-0.5,0.5
-//first face
-	// -0.5,-0.5,-0.5,
-    // 0.5,-0.5,-0.5,
-    // 0.5,-0.5,0.5
-	// -0.5,0.5,-0.5,
-	// 0.5,0.5,-0.5,
-	// 0.5,0.5,0.5
+	-0.5,-0.5,-0.5,
+	0.5,-0.5,-0.5,
+	0.5,0.5,-0.5,
+	-0.5,0.5,-0.5
 };
 
-const int boundingCubeSize = 5;
+unsigned int boundingCubeIndices[] = {
+    0,1,
+    1,2,
+    2,3,
+    3,0,
+    4,5,
+    5,6,
+    6,7,
+    7,4,
+    0,4,
+    1,5,
+    2,6,
+    3,7
+};
+
+const int boundingCubeSize = 8;
+const int boundingIndicesSize = 12;
 
 
 void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVector)
@@ -192,9 +204,9 @@ void setupMeshVAO(Mesh mesh, GLfloat* color_vector, ObjectData &object)
     glBindVertexArray(0);
 }
 
-void setupPrimitiveVAO(GLfloat* vertices, GLfloat* color_vector, int vertexCount, ObjectData &object)
+void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector, int vertexCount, ObjectData &object)
 {
-    object.indexSize = vertexCount; //# of vertices = arraysize/3 (x,y,z)
+    object.indexSize = boundingIndicesSize; //# of vertices = arraysize/3 (x,y,z)
     int size = vertexCount*sizeof(GLfloat)*3;
 
     GLfloat ModelColorArray[vertexCount*3];
@@ -235,11 +247,15 @@ void setupPrimitiveVAO(GLfloat* vertices, GLfloat* color_vector, int vertexCount
     glBufferData(GL_ARRAY_BUFFER, size, color_vector, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+    glGenBuffers(1, &(object.EBO));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, boundingIndicesSize, indices, GL_STATIC_DRAW);
+
     // glGenBuffers(1, &(object.ModelNormalVBO));
     // glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
     // glBufferData(GL_ARRAY_BUFFER, sizeof(ModelNormalArray), ModelNormalArray, GL_STATIC_DRAW);
     // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(0);
 }
@@ -316,7 +332,7 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
     glUniform3fv(lightID, 1, &lightPos[0]);
     if (elemental) {
-        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_LINES, size, GL_UNSIGNED_INT, 0);
     } else {
         glDrawArrays(GL_TRIANGLES, 0, size*3);
     }
@@ -385,7 +401,7 @@ int main(int argc, char **argv) {
     }
 
     // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
-    setupPrimitiveVAO(boundingCubeVertices, colorArray, boundingCubeSize, boundingCube);
+    setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, colorArray, boundingCubeSize, boundingCube);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
@@ -416,7 +432,7 @@ int main(int argc, char **argv) {
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, false, vec3(0,0,0));
+        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, vec3(0,0,0));
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,4,0));

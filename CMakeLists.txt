@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
 project(opengl_assignment)
 
-add_executable(cg_sph main.cpp "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp" "includes/shader.cpp" "includes/constant.h" "includes/Camera.cpp"
+add_executable(cg_sph sphviewer.cpp sphviewer.h "SPH/Particle.cpp" "SPH/SPH.cpp" "MarchingCube/MarchingCube.cpp" "includes/shader.cpp" "includes/constant.h" "includes/Camera.cpp"
                 "includes/icosahedron.cpp" "includes/cube.cpp" "includes/cylinder.cpp" "includes/mesh.cpp" "includes/utilities.cpp" "includes/sphere.cpp" "includes/scene.cpp")
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/includes/ColorFragmentShader.fragmentshader
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

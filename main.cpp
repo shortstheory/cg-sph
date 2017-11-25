@@ -64,7 +64,7 @@ struct ObjectData {
     GLuint ModelArrayID, ModelVBO, ModelColorVBO, ModelNormalVBO, EBO, indexSize;
 };
 
-GLfloat boundingCubeVertices[] = {
+float boundingCubeVertices[] = {
 	-0.5,-0.5,0.5,
 	0.5,-0.5,0.5,
 	0.5,0.5,0.5,
@@ -358,7 +358,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < particleSize; i+=1 )
         for (int j = 0; j < particleSize; j+=1)
             for (int k = 0; k < particleSize; k+=1)
-                sph.add(Particle(vec3(-0.00 + i * sphereSize, -0.0 + j * sphereSize, -0.00 + k * sphereSize), vec3(0, 0, 0)));
+                sph.add(Particle(vec3(-0.00 + i * sphereSize, 0.0 + j * sphereSize, -0.00 + k * sphereSize), vec3(0, 0, 0)));
 
     if(!glfwInit()) {
         fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -432,10 +432,10 @@ int main(int argc, char **argv) {
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, vec3(0,0,0));
+        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, vec3(0,FRAME_LENGTH[0],0), vec3(FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2));
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
-                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,4,0));
+                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,1.8f,0));
             }
             i++;
         }

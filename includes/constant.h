@@ -54,7 +54,6 @@ const double WALL_SCALE[12][3] = {
 	{0.01, FRAME_LENGTH[1] * 2, 0.01}, {0.01, FRAME_LENGTH[1] * 2, 0.01}, {0.01, FRAME_LENGTH[1] * 2, 0.01}, {0.01, FRAME_LENGTH[1] * 2, 0.01},
 	{0.01, 0.01, FRAME_LENGTH[2] * 2}, {0.01, 0.01, FRAME_LENGTH[2] * 2}, {0.01, 0.01, FRAME_LENGTH[2] * 2}, {0.01, 0.01, FRAME_LENGTH[2] * 2},
 	{FRAME_LENGTH[0] * 2, 0.01, 0.01}, {FRAME_LENGTH[0] * 2, 0.01, 0.01}, {FRAME_LENGTH[0] * 2, 0.01, 0.01}, {FRAME_LENGTH[0] * 2, 0.01, 0.01}};
-
 inline float getMagnitude(vec3 vector)
 {
 	return sqrt(vector.x*vector.x+vector.y*vector.y+vector.z*vector.z);

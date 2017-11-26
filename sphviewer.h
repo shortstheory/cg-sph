@@ -32,7 +32,6 @@
 #include "includes/cube.h"
 #include "includes/scene.h"
 #include "SPH/SPH.h"
-#include "MarchingCube/MarchingCube.h"
 
 #define SQUARE_SIDE 20
 #define MIN_ALT 0.5f
@@ -40,7 +39,6 @@
 
 typedef unsigned long long ulong64_t;
 
-const int particleSize = 15;
 const float sphereSize = 0.03f;
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;

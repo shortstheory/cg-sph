@@ -76,7 +76,7 @@ void Particle::check(const vec3 &bound) {
     for (int i = 0; i < 3; ++i) {
         if (abs(position[i]) > bound[i] - 1e-6) {
             position[i] = bound[i] * (position[i] / abs(position[i])) * 2 - position[i];
-            velocity[i] *= -0.5f;
+            velocity[i] *= COEFICIENT_OF_RESTITUTION;
         }
         /*
            if (abs(position[i]) > bound[i] - 1e-4 && velocity[i] * position[i] > 0) {

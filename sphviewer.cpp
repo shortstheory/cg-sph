@@ -3,11 +3,13 @@
 #define OFFSCREEN false
 #define CUBEMODE false
 
+const int particleSize = 15;
+
 using namespace std;
 using namespace glm;
 using namespace chrono;
 
-glm::vec3 lightPos = glm::vec3(0, 10, 20);
+glm::vec3 lightPos = glm::vec3(0, 10, 0);
 
 static Camera camera(WINDOW_WIDTH, WINDOW_WIDTH, x_min, x_max, y_min, y_max, z_min, z_max);
 
@@ -289,7 +291,7 @@ int main(int argc, char **argv) {
     sph = SPH(FRAME_LENGTH);
     sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
     vector<vec3> added;
-    for (float radius = 0.2; radius < 1; radius += (sphereSize*2))
+    for (float radius = 0.2; radius < 0.5; radius += (sphereSize*2))
     {
         mat4 T = glm::rotate(glm::mat4(1.0), (float)rand(), vec3(1, 0, 0));
         Mesh sphereMesh = Sphere(radius, 3).getMesh();
@@ -411,45 +413,14 @@ int main(int argc, char **argv) {
             drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
         }
         glLineWidth(1.0f);
-        if (CUBEMODE) {
-            list<Particle> particle_list = sph.getList();
-            vector<vec3> v_list;
-            vector<int> index_list;
-            MarchingCube marching_cube(FRAME_LENGTH, GRID_LENGTH, &particle_list);
-            marching_cube.count(v_list, index_list);
-
-            GLfloat marchingCubeVertices[v_list.size()*3];
-            GLuint marchingCubeIndices[index_list.size()];
-            int i = 0;
-            for (auto it = v_list.begin(); it != v_list.end(); it++) {
-                marchingCubeVertices[i++] = it->x;
-                marchingCubeVertices[i++] = it->y;
-                marchingCubeVertices[i++] = it->z;
-            }
-            i = 0;
-            for (auto it = index_list.begin(); it != index_list.end(); it++) {
-                marchingCubeIndices[i++] = *it;
-            }
-            setupPrimitiveVAO(&marchingCubeVertices[0], &marchingCubeIndices[0], &colorArray[0], (int)v_list.size(), (int)index_list.size(), marchingCube);
-            drawGenericObject(marchingCube.ModelArrayID, programID, proj, view, marchingCube.indexSize, false, 1, vec3(0,1.8f, 0));
-
-            // printf("size: %d\n", (int)index_list.size());
-
-            // glColor4f(color4_sphere[0], color4_sphere[1], color4_sphere[2], color4_sphere[3]);
-            // for (int i = 0; i < index_list.size(); ++i) {
-            //     int p = index_list[i];
-            //     glVertex3f(v_list[p][0] + frame_base[0], v_list[p][1] + frame_base[1], v_list[p][2] + frame_base[2]);
-            // }
-            // glEnd();
-
-        } else {
             for (Particle &particle : particle_list) {
                 if (i < spheres.size()) {
                     drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.8f,0));
                 }
                 i++;
             }
-        }
+            i++;
+
 
         if (OFFSCREEN) {
             uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
@@ -466,7 +437,7 @@ int main(int argc, char **argv) {
                 imVal += imgNum[u];
             }
             string imgName = "img/" + imVal + ".bmp";
-            // cout<<imgName<<endl;
+            cout<<imgName<<endl;
 
             FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
 

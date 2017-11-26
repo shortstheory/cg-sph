@@ -1,15 +1,15 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN true
+#define OFFSCREEN false
 #define CUBEMODE false
 
-const int particleSize = 25;
+const int particleSize = 5;
 
 using namespace std;
 using namespace glm;
 using namespace chrono;
 
-glm::vec3 lightPos = glm::vec3(0, 10, 20);
+glm::vec3 lightPos = glm::vec3(0, 10, 0);
 
 static Camera camera(WINDOW_WIDTH, WINDOW_WIDTH, x_min, x_max, y_min, y_max, z_min, z_max);
 

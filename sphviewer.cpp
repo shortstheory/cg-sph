@@ -1,9 +1,9 @@
 #include "sphviewer.h"
 
 #define OFFSCREEN true
-#define SPHERE_MODE true
+#define SPHERE_MODE false
 
-const int particleSize = 10;
+const int particleSize = 5;
 
 using namespace std;
 using namespace glm;
@@ -361,6 +361,7 @@ int main(int argc, char **argv) {
     glUseProgram(programID);
     int k = 0;
 
+    uint8_t* data = new uint8_t[WINDOW_WIDTH*WINDOW_HEIGHT*3];
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -400,7 +401,6 @@ int main(int argc, char **argv) {
 
 
         if (OFFSCREEN) {
-            uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
             glReadBuffer(GL_COLOR_ATTACHMENT0);
             glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGB,GL_UNSIGNED_BYTE,&data[0]);
 
@@ -426,11 +426,12 @@ int main(int argc, char **argv) {
         glfwPollEvents();
     }
 	glDeleteProgram(programID);
-    if (OFFSCREEN) {
+    if (OFFSCREEN) { // Cleanup
         glDeleteFramebuffers(1,&fbo);
         glDeleteRenderbuffers(1,&colorBuffer);
         glDeleteRenderbuffers(1,&depthBuffer);
     }
+    delete[] data;
     glfwTerminate();
     return 0;
 }

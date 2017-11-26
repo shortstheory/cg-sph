@@ -32,8 +32,8 @@ const float color4_white[] = {1, 1, 1, 1};
 const float color4_black[] = {0, 0, 0, 1};
 const float color4_sphere[] = {0.5f, 0, 0, 1};
 
-const int WINDOW_WIDTH = 1920;
-const int WINDOW_HEIGHT = 1080;
+const int WINDOW_WIDTH = 1920*2;
+const int WINDOW_HEIGHT = 1080*2;
 
 // const double FRAME_LENGTH[3] = {0.8, 0.8, 0.8};
 const vec3 FRAME_LENGTH(1.8, 1.8, 1.8);

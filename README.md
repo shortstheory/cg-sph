@@ -41,7 +41,7 @@ make -j4
 
 ## Results
 
-We have made a compilation of videos of the results:
+We have made a compilation of videos of the results here: [goo.gl/SDxqKH](goo.gl/SDxqKH)
 
 ![](results/frame1.png)
 

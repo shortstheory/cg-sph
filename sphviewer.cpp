@@ -1,7 +1,9 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN false
-#define CUBEMODE true
+#define OFFSCREEN true
+#define CUBEMODE false
+
+const int particleSize = 25;
 
 using namespace std;
 using namespace glm;

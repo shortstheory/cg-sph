@@ -39,7 +39,6 @@
 
 typedef unsigned long long ulong64_t;
 
-const int particleSize = 4;
 const float sphereSize = 0.03f;
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;

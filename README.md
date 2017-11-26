@@ -50,3 +50,7 @@ Initial test when rendering the scene.
 ![](results/frame0.bmp)
 
 Demonstration of the spreading of particles on applying SPH. The core pipeline was added in this part.
+
+![](results/frame2.bmp)
+
+Rendering a sphere of particles for the initial collision.

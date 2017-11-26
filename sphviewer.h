@@ -21,6 +21,7 @@
 #include <time.h>
 #include <math.h>
 #include <chrono>
+#include <algorithm>
 #include <vector>
 #include <png.h>
 
@@ -59,7 +60,7 @@ float boundingCubeVertices[] = {
     -0.5,-0.5,0.5,
     0.5,-0.5,0.5,
     0.5,0.5,0.5,
-    -0.5,0.5,0.5, 
+    -0.5,0.5,0.5,
     -0.5,-0.5,-0.5,
     0.5,-0.5,-0.5,
     0.5,0.5,-0.5,

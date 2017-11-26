@@ -1,6 +1,7 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN false
+#define OFFSCREEN true
+#define SPHERE_MODE true
 
 const int particleSize = 10;
 
@@ -263,12 +264,45 @@ void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer)
 
 int main(int argc, char **argv) {
     sph = SPH(FRAME_LENGTH);
+    
     sph.add(Particle(vec3(0, 0, 0), vec3(0, 0, 0)));
-    for (int i = 0; i < particleSize; i+=1 )
-        for (int j = 0; j < particleSize; j+=1)
-            for (int k = 0; k < particleSize; k+=1)
-                sph.add(Particle(vec3(-0.00 + i * sphereSize, 0.0 + j * sphereSize, -0.00 + k * sphereSize), vec3(0, 0, 0)));
+    if (SPHERE_MODE) {
+        vector<vec3> added;
+        for (float radius = 0.2; radius < 1.0; radius += (sphereSize*2))
+        {
+            mat4 T = glm::rotate(glm::mat4(1.0), (float)rand(), vec3(1, 0, 0));
+            Mesh sphereMesh = Sphere(radius, 3).getMesh();
+            sphereMesh.transform(T);
+            vector<Triangle> sphere = sphereMesh.getTriangles();
 
+            for (Triangle t: sphere)
+            {
+                if (find(added.begin(), added.end(), t.A) == added.end())
+                {
+                    sph.add(Particle(t.A, vec3(0, 0, 0)));
+                    added.push_back(t.A);
+                }
+
+                if (find(added.begin(), added.end(), t.B) == added.end())
+                {
+                    sph.add(Particle(t.B, vec3(0, 0, 0)));
+                    added.push_back(t.B);
+                }
+
+                if (find(added.begin(), added.end(), t.C) == added.end())
+                {
+                    sph.add(Particle(t.C, vec3(0, 0, 0)));
+                    added.push_back(t.C);
+                }
+            }
+        }
+        printf("Num particles: %d\n", added.size());
+    } else {
+        for (int i = 0; i < particleSize; i+=1 )
+            for (int j = 0; j < particleSize; j+=1)
+                for (int k = 0; k < particleSize; k+=1)
+                    sph.add(Particle(vec3(-0.00 + i * sphereSize, 0.0 + j * sphereSize, -0.00 + k * sphereSize), vec3(0, 0, 0)));
+    }
     if(!glfwInit()) {
         fprintf( stderr, "Failed to initialize GLFW\n" );
         getchar();
@@ -356,12 +390,14 @@ int main(int argc, char **argv) {
             drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
         }
         glLineWidth(1.0f);
-        for (Particle &particle : particle_list) {
-            if (i < spheres.size()) {
-                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.8f,0));
+            for (Particle &particle : particle_list) {
+                if (i < spheres.size()) {
+                    drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.8f,0));
+                }
+                i++;
             }
             i++;
-        }
+
 
         if (OFFSCREEN) {
             uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];

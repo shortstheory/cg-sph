@@ -374,25 +374,18 @@ int main(int argc, char **argv) {
             cout << glGetError();
 
             k++;
-            char imgNum[4];
+            char imgNum[10];
             string imVal;
             sprintf(imgNum, "img-%03d",k);
+            for (int u = 0; imgNum[u] != '\0'; u++) {
+                imVal += imgNum[u];
+            }
             string imgName = "img/" + imVal + ".bmp";
             cout<<imgName<<endl;
 
-            // SaveImage(imgName.c_str(), data, WINDOW_WIDTH, WINDOW_HEIGHT)
+            FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
 
-            // for (int i = 0; i < WINDOW_WIDTH*WINDOW_HEIGHT*3; i++) {
-            //     cout << data[i];
-            // }
-            // cout << sizeof(data);
-            // FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
-            // for (int u = 0; imgNum[u] != '\0'; u++) {
-            //     imVal += imgNum[u];
-            // }
-
-            // FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
-            // FreeImage_Save(FIF_BMP, image, "test.bmp", 0);
+            FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
         }
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 

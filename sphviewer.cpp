@@ -1,6 +1,7 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN true
+#define OFFSCREEN false
+#define CUBEMODE true
 
 using namespace std;
 using namespace glm;
@@ -122,9 +123,9 @@ void setupMeshVAO(Mesh mesh, GLfloat* color_vector, ObjectData &object)
     glBindVertexArray(0);
 }
 
-void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector, int vertexCount, ObjectData &object)
+void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector, int vertexCount, int indicesCount, ObjectData &object)
 {
-    object.indexSize = boundingIndicesSize; //# of vertices = arraysize/3 (x,y,z)
+    object.indexSize = indicesCount; //# of vertices = arraysize/3 (x,y,z)
     int size = vertexCount*sizeof(GLfloat)*3;
 
     GLfloat ModelColorArray[vertexCount*3];
@@ -222,6 +223,7 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
                         glm::mat4 view,
                         int size,
                         bool elemental,
+                        int elementMode,
                         glm::vec3 translationVector,
                         glm::vec3 scaleVector,
                         GLfloat rotationAngle,
@@ -245,7 +247,11 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
     glUniform3fv(lightID, 1, &lightPos[0]);
     if (elemental) {
-        glDrawElements(GL_LINES, size, GL_UNSIGNED_INT, 0);
+        if (elementMode == 0) {
+            glDrawElements(GL_LINES, size, GL_UNSIGNED_INT, 0);
+        } else if (elementMode == 1) {
+            glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, 0);
+        }
     } else {
         glDrawArrays(GL_TRIANGLES, 0, size*3);
     }
@@ -253,27 +259,30 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glBindVertexArray(0);
 }
 
-void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer, GLuint &stencilBuffer)
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer, 
+                        GLuint &stencilBuffer, GLuint &renderedTexture)
 {
-    glGenFramebuffers(1,&fbo);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+    if (OFFSCREEN) {
+        glGenFramebuffers(1,&fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glGenRenderbuffers(1,&colorBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
+        glGenRenderbuffers(1,&colorBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
+        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
 
-    glGenRenderbuffers(1, &depthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+        glGenRenderbuffers(1, &depthBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
+        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
-    glGenRenderbuffers(1, &stencilBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer);
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        // glGenRenderbuffers(1, &stencilBuffer);
+        // glBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
+        // glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, WINDOW_WIDTH, WINDOW_HEIGHT);
+        // glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer);
+        // glEnable(GL_DEPTH_TEST);
+        // glDepthFunc(GL_LESS);
+    }
 }
 
 int main(int argc, char **argv) {
@@ -306,7 +315,9 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
-    glClearColor(0.0f, 0.1f, 1.0f, 0.0f);
+    static GLuint fbo, colorBuffer, depthBuffer, stencilBuffer, renderedTexture;
+    initFrameBuffers(fbo, colorBuffer, depthBuffer, stencilBuffer, renderedTexture);
+    glClearColor(0.5f, 0.1f, 0.4f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -319,6 +330,7 @@ int main(int argc, char **argv) {
     vector<ObjectData> spheres;
     vector<ObjectData> floorObjectVector;
     ObjectData boundingCube;
+    ObjectData marchingCube;
     Scene floorScene;
     floorScene.addFloor(vec4(x_min, x_max, z_min, z_max));
     vector<Mesh> floorMesh = floorScene.getMesh();
@@ -333,12 +345,10 @@ int main(int argc, char **argv) {
     }
 
     // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
-    setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, boundingCubeColors, boundingCubeSize, boundingCube);
+    setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, boundingCubeColors, boundingCubeSize, boundingIndicesSize, boundingCube);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-    static GLuint fbo, colorBuffer, depthBuffer, stencilBuffer;
-    initFrameBuffers(fbo, colorBuffer, depthBuffer, stencilBuffer);
     glUseProgram(programID);
     int k = 0;
 
@@ -366,16 +376,49 @@ int main(int argc, char **argv) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glLineWidth(5.0f);
-        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, vec3(0,FRAME_LENGTH[0],0), vec3(FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2));
+        drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, 0, vec3(0,FRAME_LENGTH[0],0), vec3(FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2));
         for (auto it = floorObjectVector.begin(); it != floorObjectVector.end(); it++) {
             drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
         }
         glLineWidth(1.0f);
-        for (Particle &particle : particle_list) {
-            if (i < spheres.size()) {
-                drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,1.8f,0));
+        if (CUBEMODE) {
+            list<Particle> particle_list = sph.getList();
+            vector<vec3> v_list;
+            vector<int> index_list;
+            MarchingCube marching_cube(FRAME_LENGTH, GRID_LENGTH, &particle_list);
+            marching_cube.count(v_list, index_list);
+            
+            GLfloat marchingCubeVertices[v_list.size()*3];
+            GLuint marchingCubeIndices[index_list.size()];
+            int i = 0;
+            for (auto it = v_list.begin(); it != v_list.end(); it++) {
+                marchingCubeVertices[i++] = it->x;
+                marchingCubeVertices[i++] = it->y;
+                marchingCubeVertices[i++] = it->z;
             }
-            i++;
+            i = 0;
+            for (auto it = index_list.begin(); it != index_list.end(); it++) {
+                marchingCubeIndices[i++] = *it;
+            }
+            setupPrimitiveVAO(&marchingCubeVertices[0], &marchingCubeIndices[0], &colorArray[0], (int)v_list.size(), (int)index_list.size(), marchingCube);
+            drawGenericObject(marchingCube.ModelArrayID, programID, proj, view, marchingCube.indexSize, false, 1, vec3(0,1.8f, 0));
+            
+            // printf("size: %d\n", (int)index_list.size());
+
+            // glColor4f(color4_sphere[0], color4_sphere[1], color4_sphere[2], color4_sphere[3]);
+            // for (int i = 0; i < index_list.size(); ++i) {
+            //     int p = index_list[i];
+            //     glVertex3f(v_list[p][0] + frame_base[0], v_list[p][1] + frame_base[1], v_list[p][2] + frame_base[2]);
+            // }
+            // glEnd();	
+
+        } else {
+            for (Particle &particle : particle_list) {
+                if (i < spheres.size()) {
+                    drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.8f,0));
+                }
+                i++;
+            }
         }
 
         if (OFFSCREEN) {

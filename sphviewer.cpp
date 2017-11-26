@@ -1,6 +1,6 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN false
+#define OFFSCREEN true
 
 using namespace std;
 using namespace glm;
@@ -295,7 +295,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
-    glClearColor(0.5f, 0.4f, 0.2f, 0.0f);
+    glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -317,13 +317,9 @@ int main(int argc, char **argv) {
         setupMeshVAO(Sphere(sphereSize, 3).getMesh(), colorArray, spheres);
     }
 
-    // for (auto it = floorScene.getMesh().begin(); it != floorScene.getMesh().end(); it++) {
-    //     setupMeshVAO(*it, colorArray, floorObjectVector);
-    // }
     for (int i = 0; i < floorMesh.size(); i++) {
         setupMeshVAO(floorMesh.at(i), &floorColors.at(i)[0], floorObjectVector);
     }
-    cout << "floormesh" << floorObjectVector.size();
 
     // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
     setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, boundingCubeColors, boundingCubeSize, boundingCube);
@@ -370,25 +366,33 @@ int main(int argc, char **argv) {
             i++;
         }
 
-
         if (OFFSCREEN) {
             uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
             glReadBuffer(GL_COLOR_ATTACHMENT0);
             glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGB,GL_UNSIGNED_BYTE,&data[0]);
-            
-            FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
+
+            cout << glGetError();
+
             k++;
             char imgNum[4];
             string imVal;
             sprintf(imgNum, "img-%03d",k);
-            for (int u = 0; imgNum[u] != '\0'; u++) {
-                imVal += imgNum[u];
-            }
             string imgName = "img/" + imVal + ".bmp";
             cout<<imgName<<endl;
 
-            FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
-            FreeImage_Save(FIF_BMP, image, "test.bmp", 0);
+            // SaveImage(imgName.c_str(), data, WINDOW_WIDTH, WINDOW_HEIGHT)
+
+            // for (int i = 0; i < WINDOW_WIDTH*WINDOW_HEIGHT*3; i++) {
+            //     cout << data[i];
+            // }
+            // cout << sizeof(data);
+            // FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
+            // for (int u = 0; imgNum[u] != '\0'; u++) {
+            //     imVal += imgNum[u];
+            // }
+
+            // FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
+            // FreeImage_Save(FIF_BMP, image, "test.bmp", 0);
         }
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 

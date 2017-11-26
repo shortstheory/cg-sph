@@ -39,7 +39,7 @@
 
 typedef unsigned long long ulong64_t;
 
-const int particleSize = 5;
+const int particleSize = 10;
 const float sphereSize = 0.03f;
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;
@@ -110,7 +110,89 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
 
 bool initOpenGL();
 
+// bool SaveImage(const char* szPathName, void* lpBits, int w, int h)
 
+// { 
+
+// //Create a new file for writing
+
+// FILE *pFile = fopen(szPathName, "wb");
+
+// if(pFile == NULL)
+
+// { 
+
+// return false;
+
+// }
+
+// BITMAPINFOHEADER BMIH;
+
+// BMIH.biSize = sizeof(BITMAPINFOHEADER);
+
+// BMIH.biSizeImage = w * h * 3;
+
+// // Create the bitmap for this OpenGL context
+
+// BMIH.biSize = sizeof(BITMAPINFOHEADER);
+
+// BMIH.biWidth = w;
+
+// BMIH.biHeight = h;
+
+// BMIH.biPlanes = 1;
+
+// BMIH.biBitCount = 24;
+
+// BMIH.biCompression = BI_RGB;
+
+// BMIH.biSizeImage = w * h* 3; 
+
+// BITMAPFILEHEADER bmfh;
+
+// int nBitsOffset = sizeof(BITMAPFILEHEADER) + BMIH.biSize; 
+
+// LONG lImageSize = BMIH.biSizeImage;
+
+// LONG lFileSize = nBitsOffset + lImageSize;
+
+// bmfh.bfType = 'B'+('M'<<8);
+
+// bmfh.bfOffBits = nBitsOffset;
+
+// bmfh.bfSize = lFileSize;
+
+// bmfh.bfReserved1 = bmfh.bfReserved2 = 0;
+
+// //Write the bitmap file header
+
+// uint64_t nWrittenFileHeaderSize = fwrite(&bmfh, 1, 
+
+// sizeof(BITMAPFILEHEADER), pFile);
+
+// //And then the bitmap info header
+
+// uint64_t nWrittenInfoHeaderSize = fwrite(&BMIH, 
+
+// 1, sizeof(BITMAPINFOHEADER), pFile);
+
+// //Finally, write the image data itself 
+
+// //-- the data represents our drawing
+
+// uint64_t nWrittenDIBDataSize = 
+
+// fwrite(lpBits, 1, lImageSize, pFile);
+
+// fclose(pFile);
+
+ 
+
+// return true;
+
+
+
+// }
 
 
 #endif

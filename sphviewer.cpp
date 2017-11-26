@@ -1,9 +1,9 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN true
+#define OFFSCREEN false
 #define SPHERE_MODE false
 
-const int particleSize = 5;
+const int particleSize = 10;
 
 using namespace std;
 using namespace glm;
@@ -393,13 +393,11 @@ int main(int argc, char **argv) {
         glLineWidth(1.0f);
             for (Particle &particle : particle_list) {
                 if (i < spheres.size()) {
-                    drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.8f,0));
+                    drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, 0, particle.getPosition()+vec3(0,1.0f,0));
                 }
                 i++;
             }
             i++;
-
-
         if (OFFSCREEN) {
             glReadBuffer(GL_COLOR_ATTACHMENT0);
             glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGB,GL_UNSIGNED_BYTE,&data[0]);

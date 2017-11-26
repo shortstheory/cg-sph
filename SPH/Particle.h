@@ -28,7 +28,9 @@ class Particle {
         // move to new position
         void move();
         // check the position, reflect and damp the velocity based on the boundary
-        void check(const vec3 &bound);
+        void check(const vec3 &bound, const vec3 &bound_v);
+        void check_obstacle(const vector <vec3> &plane_list, const vector<double> offset_list, const vector<vec3> velocity_list);
+
 
         // kernal functions
         double KernelPoly(const Particle &_particle, double r) const;

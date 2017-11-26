@@ -15,7 +15,7 @@ using namespace glm;
 class SPH {
     public:
         SPH() {}
-        SPH(const vec3 _bound): particle_list(0), bound(_bound), base_move(0.0f, 0.0f, 0.0f) {}
+        SPH(const vec3 _bound): particle_list(0), bound(_bound), bound_v(0.0f,0.0f,0.0f), base_move(0.0f, 0.0f, 0.0f) ,shm_t(0.0f) {}
 
         // add a new particle to the SPH system
         void add(Particle _particle) {
@@ -49,7 +49,8 @@ class SPH {
         // list of particles
         list<Particle> particle_list;
         // boundary for the container
-        vec3 bound;
+        vec3 bound,bound_v;
+        double shm_t;
         // recent movement of the container
         vec3 base_move;
 };

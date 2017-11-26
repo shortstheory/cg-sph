@@ -72,18 +72,34 @@ void Particle::move() {
     // printf("density: %lf\n", density);
     // printf("pressure: %lf\n", pressure);
 }
-void Particle::check(const vec3 &bound) {
-    for (int i = 0; i < 3; ++i) {
-        if (abs(position[i]) > bound[i] - 1e-6) {
-            position[i] = bound[i] * (position[i] / abs(position[i])) * 2 - position[i];
-            velocity[i] *= COEFICIENT_OF_RESTITUTION;
-        }
-        /*
-           if (abs(position[i]) > bound[i] - 1e-4 && velocity[i] * position[i] > 0) {
-           velocity[i] *= -0.5f;
-           }*/
-    }
-}
+
+void Particle::check_obstacle(const vector <vec3> &plane_list, const vector<double> offset_list, const vector<vec3> velocity_list) {
+
+    vec3 planes;
+    double offset;
+    vec3 speed;
+    for(int i=0;i<plane_list.size();++i )
+    {
+        planes=plane_list[i];
+        offset=offset_list[i];
+        speed=velocity_list[i];
+        if(glm::dot(planes,position)<=offset)
+        {
+            velocity=glm::reflect(velocity,planes)+speed+speed;
+            for(int j=0; j<3;++j)
+            {
+                velocity[j]-=velocity[j]*COEFICIENT_OF_RESTITUTION*planes[j]/glm::length(planes);
+                position[j]+=planes[j]*(abs(glm::dot(planes,position)-offset)+0.01f)/pow(glm::length(planes),2);
+                cout<<planes[j]*(abs(glm::dot(planes,position)-offset)+0.001f)/pow(glm::length(planes),2)<<endl;
+            }
+            if(velocity[1]>3)
+                velocity[1]=1;
+            
+            break;
+         }
+     }
+
+ }
 
 double Particle::KernelPoly(const Particle &_particle, double r) const {
     return KERNAL_POLY_CONSTANT / pow(SMOOTHING_WIDTH, 9) * pow(SMOOTHING_WIDTH2 - r * r, 3);

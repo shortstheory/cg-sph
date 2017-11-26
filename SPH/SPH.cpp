@@ -1,8 +1,13 @@
 #include "SPH.h"
-
+#include <math.h>
+#include <vector>
+#include "Octree.hpp"
 using namespace std;
 
 void SPH::move() {
+    shm_t+=DELTA_TIME/1000.0f;
+    bound[0]=0.8+0.2*cos(10*shm_t);
+    bound_v[0]=-2*sin(10*shm_t);
     // bound[0]-=0.01;
     int l = particle_list.size();
     // get the list of neighbors that is close enough for each particle with the distance
@@ -45,10 +50,35 @@ void SPH::move() {
         (*it0).countColorfield(neighbour_list[i], dis_list[i]);
     }
 
+    vector <vec3> planes;
+    vector <double> offset;
+    vector <vec3> velocity;
+    planes.push_back(vec3(1.0f, 0.0f, 0.0f));
+    offset.push_back(-1.0f+0.2*cos(10*shm_t));
+    velocity.push_back(vec3(-2*sin(10*shm_t),1.0f,0.1f));
+    planes.push_back(vec3(-1.0f, 0.0f, 0.0f));
+    offset.push_back(-1.0f);
+    velocity.push_back(vec3(0,0,0));
+    planes.push_back(vec3(0.0f, 1.0f, 0.0f));
+    offset.push_back(-1.0f);
+    velocity.push_back(vec3(0,0,0));
+    planes.push_back(vec3(0.0f, -1.0f, 0.0f));
+    offset.push_back(-1.0f);
+    velocity.push_back(vec3(0,0,0));
+    planes.push_back(vec3(0.0f, 0.0f, 1.0f));
+    offset.push_back(-1.0f);
+    velocity.push_back(vec3(0,0,0));
+    planes.push_back(vec3(0.0f, 0.0f, -1.0f));
+    offset.push_back(-1.0f);
+    velocity.push_back(vec3(0,0,0));
+    // planes.push_back(vec3(1.0f, 1.0f, 1.0f));
+    // offset.push_back(-0.8f);
+
     // count final velocity and move
     for (auto it0 = particle_list.begin(); it0 != particle_list.end(); ++it0) {
         (*it0).countVelocity(base_move);
-        (*it0).check(bound);
+        (*it0).check_obstacle(planes,offset,velocity);
+        // (*it0).check(bound,bound_v);
         (*it0).move();
     }
 

@@ -11,7 +11,7 @@
 
 using namespace glm;
 
-const float COEFICIENT_OF_RESTITUTION = -0.5;
+const float COEFICIENT_OF_RESTITUTION = 0.5;
 const int PARTICLE_MAX = 1000;
 const double PARTICLE_RADIUS = 0.045f;
 const double GRID_LENGTH = 0.08f;
@@ -32,8 +32,8 @@ const float color4_white[] = {1, 1, 1, 1};
 const float color4_black[] = {0, 0, 0, 1};
 const float color4_sphere[] = {0.5f, 0, 0, 1};
 
-const int WINDOW_WIDTH = 1920*2;
-const int WINDOW_HEIGHT = 1080*2;
+const int WINDOW_WIDTH = 1280;
+const int WINDOW_HEIGHT = 720;
 
 // const double FRAME_LENGTH[3] = {0.8, 0.8, 0.8};
 const vec3 FRAME_LENGTH(1.8, 1.8, 1.8);

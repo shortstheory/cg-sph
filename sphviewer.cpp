@@ -258,16 +258,21 @@ void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer, GLu
     glGenFramebuffers(1,&fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glGenRenderbuffers(1,&colorBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
+    // glGenRenderbuffers(1,&colorBuffer);
+    // glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
 
-    glGenRenderbuffers(1, &depthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
-    
+    // glGenRenderbuffers(1, &depthBuffer);
+    // glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+    // glGenRenderbuffers(1, &stencilBuffer);
+    // glBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer);
+
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -301,7 +306,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
-    glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
+    glClearColor(0.0f, 0.1f, 1.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -332,10 +337,11 @@ int main(int argc, char **argv) {
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-    static GLuint fbo=0, colorBuffer, depthBuffer, stencilBuffer;
+    static GLuint fbo, colorBuffer, depthBuffer, stencilBuffer;
     initFrameBuffers(fbo, colorBuffer, depthBuffer, stencilBuffer);
     glUseProgram(programID);
     int k = 0;
+
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -377,7 +383,7 @@ int main(int argc, char **argv) {
             glReadBuffer(GL_COLOR_ATTACHMENT0);
             glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGB,GL_UNSIGNED_BYTE,&data[0]);
 
-            cout << glGetError();
+            // cout << glGetError();
 
             k++;
             char imgNum[10];
@@ -387,7 +393,7 @@ int main(int argc, char **argv) {
                 imVal += imgNum[u];
             }
             string imgName = "img/" + imVal + ".bmp";
-            cout<<imgName<<endl;
+            // cout<<imgName<<endl;
 
             FIBITMAP* image = FreeImage_ConvertFromRawBits(data, WINDOW_WIDTH, WINDOW_HEIGHT, 3 * WINDOW_WIDTH, 24, 0x0000FF, 0xFF0000, 0x00FF00, false);
 

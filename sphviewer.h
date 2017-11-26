@@ -31,7 +31,6 @@
 #include "includes/cube.h"
 #include "includes/scene.h"
 #include "SPH/SPH.h"
-#include "MarchingCube/MarchingCube.h"
 
 #define SQUARE_SIDE 20
 #define MIN_ALT 0.5f
@@ -82,7 +81,7 @@ GLfloat boundingCubeColors[] = {
 };
 
 GLfloat colorArray[] = {
-    0.0f, 0.0f, 1.0f
+    1.0f, 1.0f, 1.0f
 };
 
 

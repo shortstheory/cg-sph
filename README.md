@@ -18,6 +18,8 @@ Furthermore, to improve framerate and to obtain a better picture of the scene, a
 
 ```ffmpeg -i 'img-%03d.bmp' -r 30 out.mkv```
 
+Rendering modes can be changed by changing the value of ```OFFSCREEN``` to ```true``` or ```false``` in ```sphviewer.cpp```.
+
 ## Dependencies
 
 Install the dependencies using ```apt```:
@@ -36,3 +38,15 @@ cmake ..
 make -j4
 ./sphviewer
 ```
+
+## Results
+
+We have made a compilation of videos of the results:
+
+![](results/frame1.png)
+
+Initial test when rendering the scene.
+
+![](results/frame0.bmp)
+
+Demonstration of the spreading of particles on applying SPH. The core pipeline was added in this part.

@@ -11,6 +11,7 @@
 
 using namespace glm;
 
+const float COEFICIENT_OF_RESTITUTION = 0.1;
 const int PARTICLE_MAX = 1000;
 const double PARTICLE_RADIUS = 0.045f;
 const double GRID_LENGTH = 0.08f;

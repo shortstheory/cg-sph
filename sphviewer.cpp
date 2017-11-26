@@ -33,7 +33,7 @@ void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVe
         ModelNormalArray[i++] = it->z;
     }
 
-    for (i = 0; i < v.size(); i++) {
+    for (i = 0; i < v.size();) {
         for (int ctr = 0; ctr < 3; ctr++) {
             ModelColorArray[i++] = color_vector[ctr];
         }
@@ -55,14 +55,14 @@ void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVe
 
     glGenBuffers(1, &(object.ModelColorVBO));
     glBindBuffer(GL_ARRAY_BUFFER, object.ModelColorVBO);
-    glBufferData(GL_ARRAY_BUFFER, size, color_vector, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, ModelColorArray, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glGenBuffers(1, &(object.ModelNormalVBO));
     glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(ModelNormalArray), ModelNormalArray, GL_STATIC_DRAW);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(0);
 
@@ -140,7 +140,7 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
     //     ModelNormalArray[i++] = it->z;
     // }
 
-    for (i = 0; i < vertexCount*3; i++) {
+    for (i = 0; i < vertexCount*3;) {
         for (int ctr = 0; ctr < 3; ctr++) {
             ModelColorArray[i++] = color_vector[ctr];
         }
@@ -162,12 +162,12 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
 
     glGenBuffers(1, &(object.ModelColorVBO));
     glBindBuffer(GL_ARRAY_BUFFER, object.ModelColorVBO);
-    glBufferData(GL_ARRAY_BUFFER, size, color_vector, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, ModelColorArray, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glGenBuffers(1, &(object.EBO));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, boundingIndicesSize*sizeof(GLuint), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, object.indexSize*sizeof(GLuint), indices, GL_STATIC_DRAW);
 
     // glGenBuffers(1, &(object.ModelNormalVBO));
     // glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
     Scene floorScene;
     floorScene.addFloor(vec4(x_min, x_max, z_min, z_max));
     vector<Mesh> floorMesh = floorScene.getMesh();
-    GLfloat colorArray[] = {1.0f, 0.0f, 0.0f};
+    vector<vector<GLfloat>> floorColors = floorScene.getColors();
 
     for (int i = 0; i < particleSize*particleSize*particleSize; i++) {
         setupMeshVAO(Sphere(sphereSize, 3).getMesh(), colorArray, spheres);
@@ -321,12 +321,12 @@ int main(int argc, char **argv) {
     //     setupMeshVAO(*it, colorArray, floorObjectVector);
     // }
     for (int i = 0; i < floorMesh.size(); i++) {
-        setupMeshVAO(floorMesh.at(i), colorArray, floorObjectVector);
+        setupMeshVAO(floorMesh.at(i), &floorColors.at(i)[0], floorObjectVector);
     }
     cout << "floormesh" << floorObjectVector.size();
 
     // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
-    setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, colorArray, boundingCubeSize, boundingCube);
+    setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, boundingCubeColors, boundingCubeSize, boundingCube);
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
@@ -357,7 +357,12 @@ int main(int argc, char **argv) {
         }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glLineWidth(5.0f);
         drawGenericObject(boundingCube.ModelArrayID, programID, proj, view, boundingCube.indexSize, true, vec3(0,FRAME_LENGTH[0],0), vec3(FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2,FRAME_LENGTH[0]*2));
+        for (auto it = floorObjectVector.begin(); it != floorObjectVector.end(); it++) {
+            drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
+        }
+        glLineWidth(1.0f);
         for (Particle &particle : particle_list) {
             if (i < spheres.size()) {
                 drawGenericObject(spheres.at(i).ModelArrayID, programID, proj, view, spheres.at(i).indexSize, false, particle.getPosition()+vec3(0,1.8f,0));
@@ -365,9 +370,6 @@ int main(int argc, char **argv) {
             i++;
         }
 
-        for (auto it = floorObjectVector.begin(); it != floorObjectVector.end(); it++) {
-            drawGenericObject(it->ModelArrayID, programID, proj, view, it->indexSize, false);
-        }
 
         if (OFFSCREEN) {
             uint8_t data[WINDOW_WIDTH*WINDOW_HEIGHT*3];
@@ -387,7 +389,6 @@ int main(int argc, char **argv) {
 
             FreeImage_Save(FIF_BMP, image, imgName.c_str(), 0);
             FreeImage_Save(FIF_BMP, image, "test.bmp", 0);
-
         }
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 

@@ -53,14 +53,14 @@ struct ObjectData {
 };
 
 float boundingCubeVertices[] = {
-	-0.5,-0.5,0.5,
-	0.5,-0.5,0.5,
-	0.5,0.5,0.5,
-	-0.5,0.5,0.5, 
-	-0.5,-0.5,-0.5,
-	0.5,-0.5,-0.5,
-	0.5,0.5,-0.5,
-	-0.5,0.5,-0.5
+    -0.5,-0.5,0.5,
+    0.5,-0.5,0.5,
+    0.5,0.5,0.5,
+    -0.5,0.5,0.5, 
+    -0.5,-0.5,-0.5,
+    0.5,-0.5,-0.5,
+    0.5,0.5,-0.5,
+    -0.5,0.5,-0.5
 };
 
 unsigned int boundingCubeIndices[] = {
@@ -77,6 +77,15 @@ unsigned int boundingCubeIndices[] = {
     2,6,
     3,7
 };
+
+GLfloat boundingCubeColors[] = {
+    0.0f, 0.0f, 0.0f
+};
+
+GLfloat colorArray[] = {
+    1.0f, 1.0f, 1.0f
+};
+
 
 const int boundingCubeSize = 8;
 const int boundingIndicesSize = 24;

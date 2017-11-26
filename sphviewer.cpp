@@ -253,7 +253,7 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glBindVertexArray(0);
 }
 
-void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer)
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer, GLuint &stencilBuffer)
 {
     glGenFramebuffers(1,&fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -262,6 +262,12 @@ void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer)
     glBindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGB, WINDOW_WIDTH, WINDOW_HEIGHT);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorBuffer);
+
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+    
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -326,8 +332,8 @@ int main(int argc, char **argv) {
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
-    GLuint fbo=0, colorBuffer, depthBuffer;
-    initFrameBuffers(fbo, colorBuffer, depthBuffer);
+    static GLuint fbo=0, colorBuffer, depthBuffer, stencilBuffer;
+    initFrameBuffers(fbo, colorBuffer, depthBuffer, stencilBuffer);
     glUseProgram(programID);
     int k = 0;
     while(glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && !glfwWindowShouldClose(window)) {

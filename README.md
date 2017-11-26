@@ -8,7 +8,7 @@ This method is extensively used in animation and can also be used to simulate cl
 
 ## Implementation
 
-In this project, we have modified the SPH algorithm for implementation in a discretised case. The particles in this case are assumed to be spherical in shape and obey all the laws of classical mechanics. The particles are initally suspended in mid-air and then they fall with gravity to rebound with the surface.
+In this project, we have modified the SPH algorithm for implementation in a discretised case. The particles in this case are assumed to be spherical in shape and obey all the laws of classical mechanics. The particles are initally suspended in mid-air and then they fall with gravity to rebound with the surface. The orientation ofparticles in the beginning can be changed to a spherical shape by setting ```SPHERE_MODE``` to ```true```.
 
 Kernels have been used for computing the physcial properties of each particle. In this case, we have used a Gaussian kernel for weighting the effects of the neighbouring particles for the particle under consideration. The coefficients for the kernels have been taken from online reference values.
 

@@ -1,8 +1,8 @@
 #include "sphviewer.h"
 
-#define OFFSCREEN true
+#define OFFSCREEN false
 
-const int particleSize = 25;
+const int particleSize = 10;
 
 using namespace std;
 using namespace glm;

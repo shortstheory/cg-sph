@@ -85,26 +85,55 @@ unsigned int boundingCubeIndices[] = {
     3,7
 };
 
+// The boundary of the bounding cube is set to black.
+
 GLfloat boundingCubeColors[] = {
     0.0f, 0.0f, 0.0f
 };
+
+// Color used for the sphere. The color ends up looking slightly different from the framebuffer.
 
 GLfloat colorArray[] = {
     1.0f, 1.0f, 1.0f
 };
 
+// Size of the arrays used for the bounding sphere. Needed for creating VAOs.
 
 const int boundingCubeSize = 8;
 const int boundingIndicesSize = 24;
 
+// Overloaded function to create an std::vector of VAOs for Mesh objects
+
 void setupMeshVAO(Mesh mesh, GLfloat* color_vector, vector<ObjectData> &objectVector);
+
+// Overloaded function to create an single ObjectData instance with VAO data bindings
+
 void setupMeshVAO(Mesh mesh, GLfloat* color_vector, ObjectData &object);
+
+// Used for setting up VAOs for primitive objects like the bounding cube which are defined by indices
+
 void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector, int vertexCount, ObjectData &object);
+
+// Functions hooked up to OpenGL callbacks. These are used for giving the control to the camera for movement.
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+// Initialises the FBO for offscreen rendering.
+// Creates color and depth buffers and pixels are read by glReadPixels from COLOR_ATTACHMENT0.
+// Only executed if OFFSCREEN is set to true.
+
 void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer);
+
+// Initialises all OpenGL callbacks for the context.
+// Only used when OFFSCREEN is set to false.
+
 void setCallBacks(GLFWwindow* window);
+
+// Draw an object from its VertexArrayObject (VAO) and its modification vectors.
+// Vectors for modifying the scale, translation, rotation of the object can be passed.
+
 void drawGenericObject(GLuint &VAO, GLuint programID,
                         glm::mat4 proj,
                         glm::mat4 view,

@@ -21,6 +21,7 @@
 #include <time.h>
 #include <math.h>
 #include <chrono>
+#include <algorithm>
 #include <vector>
 #include <png.h>
 
@@ -39,7 +40,7 @@
 
 typedef unsigned long long ulong64_t;
 
-const int particleSize = 4;
+const int particleSize = 15;
 const float sphereSize = 0.03f;
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;
@@ -56,7 +57,7 @@ float boundingCubeVertices[] = {
     -0.5,-0.5,0.5,
     0.5,-0.5,0.5,
     0.5,0.5,0.5,
-    -0.5,0.5,0.5, 
+    -0.5,0.5,0.5,
     -0.5,-0.5,-0.5,
     0.5,-0.5,-0.5,
     0.5,0.5,-0.5,

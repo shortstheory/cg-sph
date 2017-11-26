@@ -2,7 +2,7 @@
 
 #define OFFSCREEN true
 
-const int particleSize = 15;
+const int particleSize = 25;
 
 using namespace std;
 using namespace glm;
@@ -130,17 +130,8 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
     int size = vertexCount*sizeof(GLfloat)*3;
 
     GLfloat ModelColorArray[vertexCount*3];
-    // GLfloat ModelNormalArray[normals.size()*3];
 
     ulong64_t i = 0;
- 
- 
-    // Working with a regular array is easier than working with vectors for passing on to the VS/FS
-    // for (auto it = normals.begin(); it != normals.end(); it++) {
-    //     ModelNormalArray[i++] = it->x;
-    //     ModelNormalArray[i++] = it->y;
-    //     ModelNormalArray[i++] = it->z;
-    // }
 
     for (i = 0; i < vertexCount*3;) {
         for (int ctr = 0; ctr < 3; ctr++) {
@@ -171,12 +162,6 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object.EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, object.indexSize*sizeof(GLuint), indices, GL_STATIC_DRAW);
 
-    // glGenBuffers(1, &(object.ModelNormalVBO));
-    // glBindBuffer(GL_ARRAY_BUFFER, object.ModelNormalVBO);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(ModelNormalArray), ModelNormalArray, GL_STATIC_DRAW);
-    // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     glBindVertexArray(0);
 }
 
@@ -197,8 +182,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 bool initOpenGL()
 {
-    // sph = SPH(FRAME_LENGTH);
-
     // Set OpenGL version to 3.3
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -260,8 +243,7 @@ void drawGenericObject(GLuint &VAO, GLuint programID,
     glBindVertexArray(0);
 }
 
-void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer, 
-                        GLuint &stencilBuffer, GLuint &renderedTexture)
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer)
 {
     if (OFFSCREEN) {
         glGenFramebuffers(1,&fbo);
@@ -276,13 +258,6 @@ void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer,
         glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, WINDOW_WIDTH, WINDOW_HEIGHT);
         glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
-
-        // glGenRenderbuffers(1, &stencilBuffer);
-        // glBindRenderbuffer(GL_RENDERBUFFER, stencilBuffer);
-        // glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, WINDOW_WIDTH, WINDOW_HEIGHT);
-        // glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer);
-        // glEnable(GL_DEPTH_TEST);
-        // glDepthFunc(GL_LESS);
     }
 }
 
@@ -316,8 +291,8 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return false;
     }
-    static GLuint fbo, colorBuffer, depthBuffer, stencilBuffer, renderedTexture;
-    initFrameBuffers(fbo, colorBuffer, depthBuffer, stencilBuffer, renderedTexture);
+    static GLuint fbo, colorBuffer, depthBuffer;
+    initFrameBuffers(fbo, colorBuffer, depthBuffer);
     glClearColor(0.5f, 0.1f, 0.4f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -345,7 +320,6 @@ int main(int argc, char **argv) {
         setupMeshVAO(floorMesh.at(i), &floorColors.at(i)[0], floorObjectVector);
     }
 
-    // setupMeshVAO(Cube(FRAME_LENGTH[0], FRAME_LENGTH[1], FRAME_LENGTH[2]).getMesh(), colorArray, boundingCube);
     setupPrimitiveVAO(boundingCubeVertices, boundingCubeIndices, boundingCubeColors, boundingCubeSize, boundingIndicesSize, boundingCube);
 
     float deltaTime = 0.0f;
@@ -368,7 +342,7 @@ int main(int argc, char **argv) {
         int i = 0;
         list<Particle> particle_list = sph.getList();
 
-        //rendering part
+        // rendering part
         if (OFFSCREEN) {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
         } else {
@@ -416,9 +390,11 @@ int main(int argc, char **argv) {
         glfwPollEvents();
     }
 	glDeleteProgram(programID);
-    // glDeleteFramebuffers(1,&fbo);
-    // glDeleteRenderbuffers(1,&colorBuffer);
-	// glDeleteRenderbuffers(1,&depthBuffer);
+    if (OFFSCREEN) {
+        glDeleteFramebuffers(1,&fbo);
+        glDeleteRenderbuffers(1,&colorBuffer);
+        glDeleteRenderbuffers(1,&depthBuffer);
+    }
     glfwTerminate();
     return 0;
 }

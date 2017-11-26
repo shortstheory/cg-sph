@@ -38,7 +38,9 @@
 
 typedef unsigned long long ulong64_t;
 
-const float sphereSize = 0.03f;
+// Constants for defining the rendering scene
+
+const float sphereSize = 0.03f; // Changes the rendered sphere size, not used for physics calc
 const GLfloat x_min = -SQUARE_SIDE;
 const GLfloat x_max = SQUARE_SIDE;
 const GLfloat y_min = MIN_ALT;
@@ -50,6 +52,9 @@ struct ObjectData {
     GLuint ModelArrayID, ModelVBO, ModelColorVBO, ModelNormalVBO, EBO, indexSize;
 };
 
+// Vertices used for defining the cube visually which defines the particles.
+// We make a unit cube and scale it to match the bounds of the particles.
+
 float boundingCubeVertices[] = {
     -0.5,-0.5,0.5,
     0.5,-0.5,0.5,
@@ -60,6 +65,9 @@ float boundingCubeVertices[] = {
     0.5,0.5,-0.5,
     -0.5,0.5,-0.5
 };
+
+// Order in which vertices should be joined for creating the bounding cube.
+// We use an EBO for specifying the order of vertices.
 
 unsigned int boundingCubeIndices[] = {
     0,1,
@@ -94,7 +102,7 @@ void setupPrimitiveVAO(GLfloat* vertices, GLuint* indices, GLfloat* color_vector
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer, GLuint &depthBuffer);
+void initFrameBuffers(GLuint &fbo, GLuint &colorBuffer);
 void setCallBacks(GLFWwindow* window);
 void drawGenericObject(GLuint &VAO, GLuint programID,
                         glm::mat4 proj,

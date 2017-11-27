@@ -90,7 +90,6 @@ void Particle::check_obstacle(const vector <vec3> &plane_list, const vector<doub
             {
                 velocity[j]-=velocity[j]*0.5*planes[j]/glm::length(planes);
                 position[j]+=planes[j]*(abs(glm::dot(planes,position)-offset)+0.01f)/pow(glm::length(planes),2);
-                cout<<planes[j]*(abs(glm::dot(planes,position)-offset)+0.001f)/pow(glm::length(planes),2)<<endl;
             }
             if(velocity[1]>3)
                 velocity[1]=1;

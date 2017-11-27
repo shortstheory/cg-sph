@@ -88,7 +88,7 @@ void Particle::check_obstacle(const vector <vec3> &plane_list, const vector<doub
             velocity=glm::reflect(velocity,planes)+speed+speed;
             for(int j=0; j<3;++j)
             {
-                velocity[j]-=velocity[j]*COEFICIENT_OF_RESTITUTION*planes[j]/glm::length(planes);
+                velocity[j]-=velocity[j]*0.5*planes[j]/glm::length(planes);
                 position[j]+=planes[j]*(abs(glm::dot(planes,position)-offset)+0.01f)/pow(glm::length(planes),2);
                 cout<<planes[j]*(abs(glm::dot(planes,position)-offset)+0.001f)/pow(glm::length(planes),2)<<endl;
             }

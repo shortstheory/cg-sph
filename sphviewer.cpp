@@ -9,7 +9,7 @@ using namespace std;
 using namespace glm;
 using namespace chrono;
 
-glm::vec3 lightPos = glm::vec3(0, 10, 0);
+glm::vec3 lightPos = glm::vec3(0, 3, 10);
 
 static Camera camera(WINDOW_WIDTH, WINDOW_WIDTH, x_min, x_max, y_min, y_max, z_min, z_max);
 

@@ -3,7 +3,7 @@
 #define OFFSCREEN false
 #define SPHERE_MODE false
 
-const int particleSize = 15;
+const int particleSize = 5;
 
 using namespace std;
 using namespace glm;

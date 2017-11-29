@@ -94,7 +94,7 @@ GLfloat boundingCubeColors[] = {
 // Color used for the sphere. The color ends up looking slightly different from the framebuffer.
 
 GLfloat colorArray[] = {
-    1.0f, 1.0f, 1.0f
+    0.3f, 0.2f, 0.6f
 };
 
 // Size of the arrays used for the bounding sphere. Needed for creating VAOs.

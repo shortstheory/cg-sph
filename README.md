@@ -54,3 +54,8 @@ Demonstration of the spreading of particles on applying SPH. The core pipeline w
 ![](results/frame2.bmp)
 
 Rendering a sphere of particles for the initial collision.
+
+## References
+
+[Overview of SPH](http://www.cs.columbia.edu/~batty/teaching/COMS6998/SPH_overview.pdf)
+[SMOOTHED PARTICLE HYDRODYNAMICS - J. J. Monaghan](http://adsabs.harvard.edu/full/1992ARA&amp;A..30..543M)

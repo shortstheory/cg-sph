@@ -11,6 +11,10 @@ const double KERNAL_VISC_LAPLACIAN_CONSTANT = 14.323944878;
 using namespace std;
 
 Particle::Particle(): position(0.0f, 0.0f, 0.0f), velocity(0.0f, 0.0f, 0.0f) {}
+
+/*
+    Calculating particle density
+ */
 Particle::Particle(const vec3 &_position, const vec3 &_velocity): position(_position), velocity(_velocity) {}
 
 void Particle::countDensity(const vector<Particle> &neighbour, const vector<double> &r) {
@@ -21,6 +25,10 @@ void Particle::countDensity(const vector<Particle> &neighbour, const vector<doub
     }
 }
 
+/*
+    Pressure: Force opposing compression
+    Force due to  pressure:  fp= μ∆u = −∇p
+ */
 void Particle::countPressure(const vector<Particle> &neighbour, const vector<double> &r) {
     // pressure =  1000 * (density - 12);
     pressure = pow(density / 1000.0, 7) - 1;
@@ -35,6 +43,10 @@ void Particle::countForce(const vector<Particle> &neighbour, const vector<double
     }
 }
 
+/*
+    Viscosity: Loss of energy due to internal friction.
+    Force due to  viscosity:  fv= μ∆u = μ∇ ∙ ∇u
+ */
 void Particle::countViscosity(const vector<Particle> &neighbour, const vector<double> &r) {
     viscosity = vec3(0.0f, 0.0f, 0.0f);
     int l = neighbour.size();		
@@ -42,6 +54,15 @@ void Particle::countViscosity(const vector<Particle> &neighbour, const vector<do
         viscosity += (float)(mass / density * KernalVisc(neighbour[i], r[i]) * 3e-4) * (neighbour[i].getVelocity() - velocity);
     }
 }
+
+/*
+    Calculate Surface Tension: Estimate surface curvature k
+    1 -> at particles
+    0 -> outside fluids  
+    Normal n= -∇c/|∇c|
+    Curvature k = ∇ ∙ n
+    Only apply force where ∇c ≠ 0, since that implies we are near the surface
+ */
 
 void Particle::countColorfield(const vector<Particle> &neighbour, const vector<double> &r) {
     vec3 color_grad(0.0f, 0.0f, 0.0f);
@@ -56,12 +77,19 @@ void Particle::countColorfield(const vector<Particle> &neighbour, const vector<d
     else tenssion = vec3(0.0f, 0.0f, 0.0f);
 }
 
+/*
+    Update Particle Velocity based on SPH forces and gravity.
+ */
+
 void Particle::countVelocity(const vec3 &base_move) {
     vec3 acce = (force + viscosity + tenssion) * 1.0f/(float)density;
     acce[1] += g;
     velocity += acce * (float)(DELTA_TIME/1000.0f) + base_move * (float)(1.0f/DELTA_TIME) * 200.0f;	
 }
 
+/*
+    Move individual Particles
+ */
 void Particle::move() {
     // printf("force: %lf, %lf, %lf\n", force[0], force[1], force[2]);
     // printf("viscosity: %lf, %lf, %lf\n", viscosity[0], viscosity[1], viscosity[2]);
@@ -73,6 +101,10 @@ void Particle::move() {
     // printf("pressure: %lf\n", pressure);
 }
 
+
+/*
+    Checks for container wall boundaries and constrain particle movement
+ */
 void Particle::check_obstacle(const vector <vec3> &plane_list, const vector<double> offset_list, const vector<vec3> velocity_list) {
 
     vec3 planes;
@@ -99,6 +131,11 @@ void Particle::check_obstacle(const vector <vec3> &plane_list, const vector<doub
      }
 
  }
+
+
+/*
+    Calculating Kernel Properties
+ */
 
 double Particle::KernelPoly(const Particle &_particle, double r) const {
     return KERNAL_POLY_CONSTANT / pow(SMOOTHING_WIDTH, 9) * pow(SMOOTHING_WIDTH2 - r * r, 3);
